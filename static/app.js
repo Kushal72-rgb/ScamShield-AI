@@ -111,6 +111,9 @@ const tacticPaymentBadge = document.getElementById("tacticPaymentBadge");
 const groomingPatternRow = document.getElementById("groomingPatternRow");
 const groomingPatternText = document.getElementById("groomingPatternText");
 
+// Attack Techniques Elements
+const attackTypesContainer = document.getElementById("attackTypesContainer");
+
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   checkBackendHealth();
@@ -601,6 +604,25 @@ function renderResults(data) {
   categoryBadge.textContent = data.scam_category || "Unclassified";
   explanationText.textContent = data.explanation || "No explanation provided.";
   actionText.textContent = data.recommended_action || "Stay vigilant.";
+
+  // Render Attack Techniques Detected
+  if (attackTypesContainer) {
+    attackTypesContainer.innerHTML = "";
+    const attacks = Array.isArray(data.attack_types) ? data.attack_types : [];
+    if (attacks.length > 0) {
+      attacks.forEach(attack => {
+        const badge = document.createElement("span");
+        badge.className = "attack-technique-badge";
+        badge.textContent = attack;
+        attackTypesContainer.appendChild(badge);
+      });
+    } else {
+      const note = document.createElement("p");
+      note.className = "no-attacks-note";
+      note.textContent = "No specific attack techniques detected.";
+      attackTypesContainer.appendChild(note);
+    }
+  }
 
   // Render Multi-Source Evidence Summary (Phase 6)
   if (evidenceSummaryBlock && data.evidence_summary) {

@@ -266,8 +266,24 @@
               <span class="sub-label">Assessed Threat Level</span>
               <div class="risk-badge-wrapper">
                 <span id="riskBadge" class="risk-badge">LOW</span>
-                <span id="categoryBadge" class="category-badge">Scam Category</span>
+                <div class="primary-cat-box">
+                  <span class="primary-cat-label">Primary Category:</span>
+                  <span id="categoryBadge" class="category-badge">Scam Category</span>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Attack Techniques Detected Block -->
+          <div id="attackTechniquesBlock" class="result-block attack-techniques-card">
+            <h4 class="block-title attack-techniques-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Attack Techniques Detected
+            </h4>
+            <div id="attackTypesContainer" class="attack-types-container">
+              <p class="no-attacks-note">No specific attack techniques detected.</p>
             </div>
           </div>
           <!-- Multi-Source Evidence Summary & Fusion (Phase 6) -->

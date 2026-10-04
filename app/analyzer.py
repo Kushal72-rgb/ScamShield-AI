@@ -48,6 +48,35 @@ Guidelines for Analysis:
 6. Critical PhishTank Reputation Rule:
    - If a URL is verified in PhishTank (KNOWN_PHISHING), that provides decisive evidence of active fraud.
    - If PhishTank returns NO_MATCH (no record found in database), you MUST NOT assume the URL is safe. Newly registered phishing links, spear-phishing campaigns, and evasive redirects often do not appear in public blacklist databases. Always evaluate local structural signals, brand impersonation, protocol, and context.
+
+7. Attack Techniques (attack_types):
+   - A single message can contain multiple attack techniques simultaneously (e.g., bank impersonation, OTP request, urgency, and a malicious link).
+   - Return a list in `attack_types` of all distinct attack techniques detected in the analyzed content (empty [] if routine/legitimate).
+   - Use the controlled taxonomy:
+     * Bank Impersonation
+     * Credential Phishing
+     * UPI/Payment Fraud
+     * OTP Theft
+     * Password/Account Credential Theft
+     * Malicious Download
+     * Malicious Link
+     * Typosquatting
+     * Punycode/IDN Homograph
+     * URL Obfuscation
+     * Open Redirect Abuse
+     * Suspicious Shortened URL
+     * Brand Impersonation
+     * Government Impersonation
+     * Delivery Scam
+     * Fake Job Scam
+     * Lottery/Prize Scam
+     * Investment/Crypto Scam
+     * Tech Support Scam
+     * Friend/Family Impersonation
+     * Social Engineering
+     * Urgency/Threat Manipulation
+     * Trust/Grooming Manipulation
+   - Note: The `scam_category` remains the single PRIMARY category for the communication.
 """
 
 SCREENSHOT_SYSTEM_PROMPT = """You are ScamShield AI, an expert cybersecurity and fraud detection analyst specializing in multimodal inspection of digital screenshots.
@@ -69,6 +98,7 @@ Follow the same guidelines:
 - Suspicious Indicators: distinct red flags observed in text and visual elements
 - Explanation: clear, plain-English breakdown of why the screenshot is dangerous or safe
 - Recommended Safe Action: actionable advice for the recipient
+- Attack Techniques (attack_types): list all distinct attack techniques detected from the controlled taxonomy (e.g. Bank Impersonation, Credential Phishing, OTP Theft, Malicious Link, Urgency/Threat Manipulation). Empty [] if legitimate.
 """
 
 CONVERSATION_SYSTEM_PROMPT = """You are ScamShield AI, an expert cybersecurity and fraud detection analyst specializing in multi-message conversation and social engineering thread analysis.
@@ -92,6 +122,7 @@ Analyze the entire conversation trajectory and return the full structured assess
 - Suspicious Indicators: list key red flags observed across turns
 - Explanation: explain how the conversation developed, detailing manipulation tactics
 - Recommended Safe Action: practical safety steps
+- Attack Techniques (attack_types): list all distinct attack techniques detected across the conversation turns from the controlled taxonomy (e.g. Investment/Crypto Scam, Social Engineering, Trust/Grooming Manipulation, Urgency/Threat Manipulation, UPI/Payment Fraud). Empty [] if legitimate.
 - Conversation Tactics (under conversation_tactics):
   * trust_building_observed: boolean
   * urgency_escalation_observed: boolean

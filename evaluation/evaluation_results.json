@@ -1,6 +1,6 @@
 {
   "evaluation_type": "Synthetic Internal Evaluation Benchmark",
-  "timestamp": "2026-10-04 10:29:23 UTC",
+  "timestamp": "2026-10-04 11:01:07 UTC",
   "disclaimer": "This synthetic benchmark provides comparative metrics for development and validation. It does not represent real-world generalization or operational accuracy.",
   "url_heuristics_evaluation": {
     "metrics": {
@@ -678,6 +678,311 @@
       }
     ],
     "false_positives": [],
+    "false_negatives": []
+  },
+  "multi_attack_evaluation": {
+    "metrics": {
+      "total_cases": 10,
+      "exact_matches": 6,
+      "exact_match_ratio": 0.6,
+      "total_expected_labels": 35,
+      "total_predicted_labels": 40,
+      "total_true_positives": 35,
+      "total_false_positives": 5,
+      "total_false_negatives": 0,
+      "attack_type_coverage": 1.0,
+      "precision": 0.875,
+      "micro_f1": 0.9333
+    },
+    "results": [
+      {
+        "id": "MA01",
+        "name": "Bank Phishing + OTP Theft + Malicious Link + Urgency",
+        "expected_attack_types": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Urgency/Threat Manipulation"
+        ],
+        "predicted_attack_types": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Social Engineering",
+          "Urgency/Threat Manipulation"
+        ],
+        "true_positives": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Urgency/Threat Manipulation"
+        ],
+        "false_positives": [
+          "Social Engineering"
+        ],
+        "false_negatives": [],
+        "is_exact_match": false,
+        "jaccard_similarity": 0.8333
+      },
+      {
+        "id": "MA02",
+        "name": "Executable Download + Threat Urgency + Malicious Link",
+        "expected_attack_types": [
+          "Malicious Download",
+          "Malicious Link",
+          "Urgency/Threat Manipulation"
+        ],
+        "predicted_attack_types": [
+          "Malicious Download",
+          "Malicious Link",
+          "Social Engineering",
+          "Urgency/Threat Manipulation"
+        ],
+        "true_positives": [
+          "Malicious Download",
+          "Malicious Link",
+          "Urgency/Threat Manipulation"
+        ],
+        "false_positives": [
+          "Social Engineering"
+        ],
+        "false_negatives": [],
+        "is_exact_match": false,
+        "jaccard_similarity": 0.75
+      },
+      {
+        "id": "MA03",
+        "name": "Typosquatting + Bank Impersonation + OTP Theft",
+        "expected_attack_types": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Typosquatting"
+        ],
+        "predicted_attack_types": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Password/Account Credential Theft",
+          "Typosquatting"
+        ],
+        "true_positives": [
+          "Bank Impersonation",
+          "Credential Phishing",
+          "Malicious Link",
+          "OTP Theft",
+          "Typosquatting"
+        ],
+        "false_positives": [
+          "Password/Account Credential Theft"
+        ],
+        "false_negatives": [],
+        "is_exact_match": false,
+        "jaccard_similarity": 0.8333
+      },
+      {
+        "id": "MA04",
+        "name": "Delivery Smishing + Shortened URL + Payment Extortion",
+        "expected_attack_types": [
+          "Delivery Scam",
+          "Malicious Link",
+          "Suspicious Shortened URL",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "predicted_attack_types": [
+          "Credential Phishing",
+          "Delivery Scam",
+          "Malicious Link",
+          "Social Engineering",
+          "Suspicious Shortened URL",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "true_positives": [
+          "Delivery Scam",
+          "Malicious Link",
+          "Suspicious Shortened URL",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "false_positives": [
+          "Credential Phishing",
+          "Social Engineering"
+        ],
+        "false_negatives": [],
+        "is_exact_match": false,
+        "jaccard_similarity": 0.7143
+      },
+      {
+        "id": "MA05",
+        "name": "IRS Tax Fraud + Arrest Coercion + Payment Demand",
+        "expected_attack_types": [
+          "Government Impersonation",
+          "Social Engineering",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "predicted_attack_types": [
+          "Government Impersonation",
+          "Social Engineering",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "true_positives": [
+          "Government Impersonation",
+          "Social Engineering",
+          "UPI/Payment Fraud",
+          "Urgency/Threat Manipulation"
+        ],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      },
+      {
+        "id": "MA06",
+        "name": "Tech Support Scam + Artificial Renewal Threat",
+        "expected_attack_types": [
+          "Social Engineering",
+          "Tech Support Scam",
+          "Urgency/Threat Manipulation"
+        ],
+        "predicted_attack_types": [
+          "Social Engineering",
+          "Tech Support Scam",
+          "Urgency/Threat Manipulation"
+        ],
+        "true_positives": [
+          "Social Engineering",
+          "Tech Support Scam",
+          "Urgency/Threat Manipulation"
+        ],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      },
+      {
+        "id": "MA07",
+        "name": "Fake Job Scam + Advance Registration Fee Demand",
+        "expected_attack_types": [
+          "Fake Job Scam",
+          "UPI/Payment Fraud"
+        ],
+        "predicted_attack_types": [
+          "Fake Job Scam",
+          "UPI/Payment Fraud"
+        ],
+        "true_positives": [
+          "Fake Job Scam",
+          "UPI/Payment Fraud"
+        ],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      },
+      {
+        "id": "MA08",
+        "name": "Romance Crypto Investment Grooming + Payment Demand",
+        "expected_attack_types": [
+          "Investment/Crypto Scam",
+          "Social Engineering",
+          "Trust/Grooming Manipulation",
+          "UPI/Payment Fraud"
+        ],
+        "predicted_attack_types": [
+          "Investment/Crypto Scam",
+          "Social Engineering",
+          "Trust/Grooming Manipulation",
+          "UPI/Payment Fraud"
+        ],
+        "true_positives": [
+          "Investment/Crypto Scam",
+          "Social Engineering",
+          "Trust/Grooming Manipulation",
+          "UPI/Payment Fraud"
+        ],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      },
+      {
+        "id": "MA09",
+        "name": "Obfuscated IP URL + Credential Phishing",
+        "expected_attack_types": [
+          "Credential Phishing",
+          "Malicious Link",
+          "Password/Account Credential Theft",
+          "URL Obfuscation"
+        ],
+        "predicted_attack_types": [
+          "Credential Phishing",
+          "Malicious Link",
+          "Password/Account Credential Theft",
+          "URL Obfuscation"
+        ],
+        "true_positives": [
+          "Credential Phishing",
+          "Malicious Link",
+          "Password/Account Credential Theft",
+          "URL Obfuscation"
+        ],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      },
+      {
+        "id": "MA10",
+        "name": "Legitimate Routine Workplace Communication",
+        "expected_attack_types": [],
+        "predicted_attack_types": [],
+        "true_positives": [],
+        "false_positives": [],
+        "false_negatives": [],
+        "is_exact_match": true,
+        "jaccard_similarity": 1.0
+      }
+    ],
+    "false_positives": [
+      {
+        "id": "MA01",
+        "name": "Bank Phishing + OTP Theft + Malicious Link + Urgency",
+        "false_positives": [
+          "Social Engineering"
+        ]
+      },
+      {
+        "id": "MA02",
+        "name": "Executable Download + Threat Urgency + Malicious Link",
+        "false_positives": [
+          "Social Engineering"
+        ]
+      },
+      {
+        "id": "MA03",
+        "name": "Typosquatting + Bank Impersonation + OTP Theft",
+        "false_positives": [
+          "Password/Account Credential Theft"
+        ]
+      },
+      {
+        "id": "MA04",
+        "name": "Delivery Smishing + Shortened URL + Payment Extortion",
+        "false_positives": [
+          "Credential Phishing",
+          "Social Engineering"
+        ]
+      }
+    ],
     "false_negatives": []
   },
   "message_pipeline_evaluation": {

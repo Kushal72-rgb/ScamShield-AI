@@ -7,7 +7,13 @@ from typing import Dict, List, Any
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from evaluation.dataset import MESSAGE_DATASET, URL_DATASET, DEGRADED_MODE_DATASET, CONVERSATION_DATASET
+from evaluation.dataset import (
+    MESSAGE_DATASET,
+    URL_DATASET,
+    DEGRADED_MODE_DATASET,
+    CONVERSATION_DATASET,
+    MULTI_ATTACK_DATASET,
+)
 from app.analyzer import analyze_message, analyze_conversation, _screen_message_offline
 from app.url_analyzer import analyze_url, analyze_all_urls
 from app.models import ConversationMessage
@@ -385,6 +391,135 @@ def run_conversation_evaluation(dataset: List[Dict[str, Any]], offline: bool = F
     }
 
 
+def run_multi_attack_evaluation(dataset: List[Dict[str, Any]], offline: bool = False) -> Dict[str, Any]:
+    """Evaluate Part 5: Multi-Attack Classification Coverage and Multi-Label Matches."""
+    mode_text = "OFFLINE HEURISTICS" if offline else ("GEMINI AI + HEURISTICS" if GEMINI_API_KEY else "OFFLINE HEURISTICS")
+    print("\n" + "=" * 70)
+    print(f"PART 5: MULTI-ATTACK CLASSIFICATION BENCHMARK ({mode_text})")
+    print("=" * 70)
+
+    total_expected_labels = 0
+    total_predicted_labels = 0
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+    exact_matches = 0
+    case_results = []
+    fps_list = []
+    fns_list = []
+
+    for item in dataset:
+        case_id = item["id"]
+        name = item["name"]
+        expected_attacks = set(item.get("expected_attack_types", []))
+        total_expected_labels += len(expected_attacks)
+
+        # Run analysis
+        if "messages" in item:
+            conv_msgs = [ConversationMessage(**m) for m in item["messages"]]
+            if offline or not GEMINI_API_KEY:
+                from unittest.mock import patch
+                with patch("app.analyzer.GEMINI_API_KEY", ""):
+                    res = analyze_conversation(conv_msgs)
+            else:
+                res = analyze_conversation(conv_msgs)
+        else:
+            text = item["text"]
+            if offline or not GEMINI_API_KEY:
+                offline_res = _screen_message_offline(text)
+                urls = analyze_all_urls(text)
+                res = fuse_evidence(
+                    gemini_response=None,
+                    urls_detected=urls,
+                    raw_message=text,
+                    gemini_error="Simulated Degraded Mode",
+                    offline_assessment=offline_res,
+                )
+            else:
+                res = analyze_message(text)
+
+        predicted_attacks = set(res.attack_types)
+        total_predicted_labels += len(predicted_attacks)
+
+        tp_set = expected_attacks.intersection(predicted_attacks)
+        fp_set = predicted_attacks - expected_attacks
+        fn_set = expected_attacks - predicted_attacks
+
+        total_tp += len(tp_set)
+        total_fp += len(fp_set)
+        total_fn += len(fn_set)
+
+        is_exact = (expected_attacks == predicted_attacks)
+        if is_exact:
+            exact_matches += 1
+
+        if fp_set:
+            fps_list.append({"id": case_id, "name": name, "false_positives": sorted(list(fp_set))})
+        if fn_set:
+            fns_list.append({"id": case_id, "name": name, "false_negatives": sorted(list(fn_set))})
+
+        union_len = len(expected_attacks.union(predicted_attacks))
+        jaccard = len(tp_set) / union_len if union_len > 0 else 1.0
+
+        status = "EXACT MATCH" if is_exact else f"PARTIAL (Jaccard: {jaccard:.2f})"
+        print(f"[{case_id}] {name[:35]:<35} | {status} | Pred: {sorted(list(predicted_attacks))}")
+
+        case_results.append({
+            "id": case_id,
+            "name": name,
+            "expected_attack_types": sorted(list(expected_attacks)),
+            "predicted_attack_types": sorted(list(predicted_attacks)),
+            "true_positives": sorted(list(tp_set)),
+            "false_positives": sorted(list(fp_set)),
+            "false_negatives": sorted(list(fn_set)),
+            "is_exact_match": is_exact,
+            "jaccard_similarity": round(jaccard, 4),
+        })
+
+    total_cases = len(dataset)
+    coverage = total_tp / total_expected_labels if total_expected_labels > 0 else 1.0
+    precision = total_tp / total_predicted_labels if total_predicted_labels > 0 else 1.0
+    micro_f1 = (2 * precision * coverage / (precision + coverage)) if (precision + coverage) > 0 else 0.0
+    exact_match_ratio = exact_matches / total_cases if total_cases > 0 else 0.0
+
+    metrics = {
+        "total_cases": total_cases,
+        "exact_matches": exact_matches,
+        "exact_match_ratio": round(exact_match_ratio, 4),
+        "total_expected_labels": total_expected_labels,
+        "total_predicted_labels": total_predicted_labels,
+        "total_true_positives": total_tp,
+        "total_false_positives": total_fp,
+        "total_false_negatives": total_fn,
+        "attack_type_coverage": round(coverage, 4),
+        "precision": round(precision, 4),
+        "micro_f1": round(micro_f1, 4),
+    }
+
+    return {
+        "metrics": metrics,
+        "results": case_results,
+        "false_positives": fps_list,
+        "false_negatives": fns_list,
+    }
+
+
+def print_multi_attack_summary(title: str, eval_data: Dict[str, Any]):
+    """Pretty-print multi-attack classification benchmark results."""
+    metrics = eval_data["metrics"]
+    print("\n" + "-" * 70)
+    print(f"EVALUATION RESULTS: {title}")
+    print("NOTE: Synthetic/Internal Multi-Attack Benchmark (Does not claim real-world generalization)")
+    print("-" * 70)
+    print(f"Total Test Cases:            {metrics['total_cases']}")
+    print(f"Exact Matches (Subset Acc):  {metrics['exact_matches']}/{metrics['total_cases']} ({metrics['exact_match_ratio'] * 100:.1f}%)")
+    print(f"Attack Type Coverage/Recall: {metrics['attack_type_coverage'] * 100:.2f}% (TP={metrics['total_true_positives']}/{metrics['total_expected_labels']})")
+    print(f"Multi-Label Precision:       {metrics['precision'] * 100:.2f}% (FP={metrics['total_false_positives']})")
+    print(f"Multi-Label Micro F1:        {metrics['micro_f1'] * 100:.2f}%")
+    print(f"False Negatives Count:       {metrics['total_false_negatives']}")
+    print("-" * 70)
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="ScamShield AI Synthetic Evaluation Benchmark")
@@ -392,7 +527,8 @@ def main():
     parser.add_argument("--degraded-only", action="store_true", help="Run only the degraded mode API-down evaluation")
     parser.add_argument("--conversation-only", action="store_true", help="Run only the multi-turn conversation evaluation")
     parser.add_argument("--message-only", action="store_true", help="Run only the message pipeline evaluation")
-    parser.add_argument("--offline", action="store_true", help="Run URL, Degraded Mode, and Conversation evaluations offline")
+    parser.add_argument("--multi-attack-only", action="store_true", help="Run only the multi-attack evaluation")
+    parser.add_argument("--offline", action="store_true", help="Run URL, Degraded Mode, Conversation, and Multi-Attack evaluations offline")
     args = parser.parse_args()
 
     print("Starting ScamShield AI Synthetic Evaluation Benchmark...", flush=True)
@@ -406,7 +542,7 @@ def main():
         except Exception:
             existing_output = {}
 
-    run_all = not (args.url_only or args.degraded_only or args.conversation_only or args.message_only or args.offline)
+    run_all = not (args.url_only or args.degraded_only or args.conversation_only or args.message_only or args.multi_attack_only or args.offline)
 
     # 1. URL Evaluation (Deterministic heuristics, 40 cases)
     url_eval = None
@@ -441,7 +577,16 @@ def main():
             conv_eval["false_negatives"],
         )
 
-    # 4. Message Pipeline Evaluation (Gemini AI + ScamShield, 30 cases)
+    # 4. Multi-Attack Evaluation (Synthetic Multi-Attack Dataset, 10 cases)
+    multi_attack_eval = None
+    if run_all or args.multi_attack_only or args.offline:
+        multi_attack_eval = run_multi_attack_evaluation(MULTI_ATTACK_DATASET, offline=args.offline)
+        print_multi_attack_summary(
+            f"Multi-Attack Technique Extraction ({len(MULTI_ATTACK_DATASET)} Cases)",
+            multi_attack_eval,
+        )
+
+    # 5. Message Pipeline Evaluation (Gemini AI + ScamShield, 30 cases)
     msg_eval = None
     if (run_all or args.message_only) and not args.offline:
         if GEMINI_API_KEY:
@@ -464,6 +609,7 @@ def main():
         "url_heuristics_evaluation": url_eval if url_eval is not None else existing_output.get("url_heuristics_evaluation"),
         "degraded_mode_evaluation": degraded_eval if degraded_eval is not None else existing_output.get("degraded_mode_evaluation"),
         "conversation_evaluation": conv_eval if conv_eval is not None else existing_output.get("conversation_evaluation"),
+        "multi_attack_evaluation": multi_attack_eval if multi_attack_eval is not None else existing_output.get("multi_attack_evaluation"),
         "message_pipeline_evaluation": msg_eval if msg_eval is not None else existing_output.get("message_pipeline_evaluation"),
     }
 

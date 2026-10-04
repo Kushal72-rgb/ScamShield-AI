@@ -314,7 +314,7 @@ pip install -r requirements.txt
 
 Verify the local deterministic engine, regression cases, and evidence fusion layer:
 ```bash
-python -m unittest discover tests -v
+python -m pytest -v
 ```
 
 ### 5. Start the Application
@@ -349,23 +349,66 @@ Open your browser to:
 
 ---
 
+## Multi-Attack Detection
+
+A fundamental limitation of single-label scam classifiers is that real-world fraud messages frequently combine multiple distinct attack vectors into a single lure. For example, a single smishing message may simultaneously deploy bank impersonation, credential harvesting, OTP solicitation, a deceptive malicious link, and artificial time pressure.
+
+ScamShield AI distinguishes between:
+1. **The Primary Scam Category (`scam_category`)**: The overarching operational fraud category (e.g., `Bank/Financial Impersonation`, `UPI Payment Fraud`, `Delivery Smishing`) preserved for backward compatibility and high-level triage.
+2. **Individual Attack Techniques (`attack_types`)**: A granular list of all discrete attack techniques detected within the analyzed content.
+
+### Controlled Taxonomy
+ScamShield AI categorizes attack techniques using a controlled 23-item taxonomy:
+- `Bank Impersonation`
+- `Credential Phishing`
+- `UPI/Payment Fraud`
+- `OTP Theft`
+- `Password/Account Credential Theft`
+- `Malicious Download`
+- `Malicious Link`
+- `Typosquatting`
+- `Punycode/IDN Homograph`
+- `URL Obfuscation`
+- `Open Redirect Abuse`
+- `Suspicious Shortened URL`
+- `Brand Impersonation`
+- `Government Impersonation`
+- `Delivery Scam`
+- `Fake Job Scam`
+- `Lottery/Prize Scam`
+- `Investment/Crypto Scam`
+- `Tech Support Scam`
+- `Friend/Family Impersonation`
+- `Social Engineering`
+- `Urgency/Threat Manipulation`
+- `Trust/Grooming Manipulation`
+
+### Multi-Attack Example
+Consider this single phishing SMS:
+> *"Chase Alert: Unusual card activity of $840 detected. Enter your one-time passcode (OTP) at http://chase-security-verify.net/auth immediately to unfreeze your card before it is permanently blocked."*
+
+ScamShield AI yields:
+- **Primary Category**: `Bank/Financial Impersonation`
+- **Attack Techniques Detected**:
+  - `Bank Impersonation`
+  - `OTP Theft`
+  - `Malicious Link`
+  - `Credential Phishing`
+  - `Urgency/Threat Manipulation`
+
+### Deterministic Extraction + Gemini Fusion
+To guarantee that security signals are never missed even if an LLM is offline or inconsistent:
+- **Deterministic Multi-Attack Extraction (`detect_attack_types`)**: Deterministically identifies attacks using URL security signals (typosquatting, obfuscated IPs, punycode, dangerous extensions, shortened links) and message regex cues (OTP solicitations, password demands, payment requests, artificial urgency, institutional impersonation).
+- **Gemini AI Extraction**: Gemini outputs a structured array of attack types based on deep multimodal semantic comprehension.
+- **Synonym Normalization & Deduplication (`merge_attack_types`)**: Canonicalizes variants (e.g., `"OTP harvesting"` $\rightarrow$ `"OTP Theft"`, `"bank fraud"` $\rightarrow$ `"Bank Impersonation"`) and deduplicates results into the controlled taxonomy.
+- **Safe Benign Calibration**: For legitimate, low-risk communications, `attack_types` is guaranteed to return `[]` to prevent false positive technique tagging.
+
+---
+
 ## Synthetic / Internal Evaluation Results
 
 > [!NOTE]
 > **Evaluation Disclaimer**: The metrics below are derived from a controlled **synthetic/internal benchmark dataset** (`evaluation/dataset.py`). They measure comparative implementation performance against curated test cases and **do not claim or represent real-world generalization or operational accuracy**.
-
-### 1. Local URL Security Analyzer (Deterministic Heuristics)
-Evaluated across **20 synthetic cases** (10 suspicious URLs, 10 legitimate URLs) covering raw IP addresses, brand impersonation, deceptive `@` authority routing, high-risk TLDs, and excessive hyphens:
-
-| Metric | Result |
-| :--- | :---: |
-| **Total Cases** | 20 |
-| **Accuracy** | **100.00%** (20/20) |
-| **Precision** | **100.00%** (10/10) |
-| **Recall** | **100.00%** (10/10) |
-| **F1-Score** | **1.0000** |
-| **False Positives (FP)** | 0 |
-| **False Negatives (FN)** | 0 |
 
 ### 1. Local URL Security Analyzer Heuristics
 Evaluated across **40 curated cases** (20 malicious/zero-day/obfuscated URLs and 20 legitimate brand/utility/cloud URLs) including punycode homographs, typosquatting, raw/hex/dword IPs, disposable tunneling, shortened links, non-standard ports, and executable smishing drops:
@@ -420,12 +463,27 @@ Evaluated across **4 multi-turn synthetic dialogue threads** (pig-butchering, ro
 | **Accuracy** | **100.00%** (4/4) |
 | **F1-Score** | **1.0000** |
 
+### 5. Multi-Attack Technique Extraction (Synthetic Multi-Attack Benchmark)
+Evaluated across **10 synthetic multi-attack test cases** (`MA01`–`MA10`) testing multi-label detection coverage, individual technique identification, and benign calibration:
+
+| Metric | Result |
+| :--- | :---: |
+| **Total Cases** | 10 |
+| **Exact Matches (Subset Accuracy)** | **60.0%** (6/10) |
+| **Attack Type Coverage / Recall** | **100.00%** (35/35 true techniques detected) |
+| **Multi-Label Precision** | **87.50%** (35/40 predicted tags) |
+| **Multi-Label Micro F1** | **93.33%** |
+| **False Negatives Count** | 0 |
+
 ### Running the Evaluation Suite
 ```bash
 # Run local URL evaluation only (no external API calls)
 python evaluation/evaluate.py --url-only
 
-# Run offline suite (URLs, Degraded Mode, Conversation heuristics)
+# Run multi-attack evaluation only
+python evaluation/evaluate.py --multi-attack-only
+
+# Run offline suite (URLs, Degraded Mode, Conversation, Multi-Attack heuristics)
 python evaluation/evaluate.py --offline
 
 # Run complete evaluation benchmark

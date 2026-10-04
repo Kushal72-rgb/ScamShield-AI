@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from app.models import (
     AnalysisResponse,
+    CONTROLLED_ATTACK_TYPES,
     ConversationTactics,
     EvidenceSummary,
     PhishTankReputationStatus,
@@ -12,6 +13,435 @@ from app.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+ATTACK_TYPE_SYNONYMS = {
+    # Bank Impersonation
+    "bank impersonation": "Bank Impersonation",
+    "bank fraud": "Bank Impersonation",
+    "financial impersonation": "Bank Impersonation",
+    "financial institution impersonation": "Bank Impersonation",
+    "bank/financial impersonation": "Bank Impersonation",
+    "bank alert": "Bank Impersonation",
+    "banking smishing": "Bank Impersonation",
+    # Credential Phishing
+    "credential phishing": "Credential Phishing",
+    "phishing": "Credential Phishing",
+    "fake login": "Credential Phishing",
+    "login phishing": "Credential Phishing",
+    "account verification phishing": "Credential Phishing",
+    # UPI/Payment Fraud
+    "upi payment fraud": "UPI/Payment Fraud",
+    "upi/payment fraud": "UPI/Payment Fraud",
+    "upi fraud": "UPI/Payment Fraud",
+    "payment fraud": "UPI/Payment Fraud",
+    "instant payment fraud": "UPI/Payment Fraud",
+    "payment demand": "UPI/Payment Fraud",
+    "fake cashback": "UPI/Payment Fraud",
+    "wire fraud": "UPI/Payment Fraud",
+    # OTP Theft
+    "otp theft": "OTP Theft",
+    "otp harvesting": "OTP Theft",
+    "one-time passcode theft": "OTP Theft",
+    "one-time password theft": "OTP Theft",
+    "one-time-password theft": "OTP Theft",
+    "otp interception": "OTP Theft",
+    "otp extraction": "OTP Theft",
+    "otp phishing": "OTP Theft",
+    "2fa bypass": "OTP Theft",
+    # Password/Account Credential Theft
+    "password/account credential theft": "Password/Account Credential Theft",
+    "password credential theft": "Password/Account Credential Theft",
+    "account credential theft": "Password/Account Credential Theft",
+    "password theft": "Password/Account Credential Theft",
+    "credential theft": "Password/Account Credential Theft",
+    "login credential theft": "Password/Account Credential Theft",
+    "password harvesting": "Password/Account Credential Theft",
+    # Malicious Download
+    "malicious download": "Malicious Download",
+    "executable download": "Malicious Download",
+    "trojan download": "Malicious Download",
+    "malware download": "Malicious Download",
+    "payload download": "Malicious Download",
+    "malicious payload": "Malicious Download",
+    "trojan payload": "Malicious Download",
+    # Malicious Link
+    "malicious link": "Malicious Link",
+    "suspicious link": "Malicious Link",
+    "phishing link": "Malicious Link",
+    "fake url": "Malicious Link",
+    "dangerous link": "Malicious Link",
+    "deceptive url": "Malicious Link",
+    "untrusted link": "Malicious Link",
+    # Typosquatting
+    "typosquatting": "Typosquatting",
+    "leetspeak domain": "Typosquatting",
+    "character substitution": "Typosquatting",
+    "combosquatting": "Typosquatting",
+    "lookalike domain": "Typosquatting",
+    # Punycode/IDN Homograph
+    "punycode/idn homograph": "Punycode/IDN Homograph",
+    "punycode": "Punycode/IDN Homograph",
+    "idn homograph": "Punycode/IDN Homograph",
+    "homoglyph attack": "Punycode/IDN Homograph",
+    "punycode spoofing": "Punycode/IDN Homograph",
+    "idn homograph attack": "Punycode/IDN Homograph",
+    # URL Obfuscation
+    "url obfuscation": "URL Obfuscation",
+    "obfuscated ip": "URL Obfuscation",
+    "hex ip": "URL Obfuscation",
+    "dword ip": "URL Obfuscation",
+    "octal ip": "URL Obfuscation",
+    "ip obfuscation": "URL Obfuscation",
+    "hostname obfuscation": "URL Obfuscation",
+    # Open Redirect Abuse
+    "open redirect abuse": "Open Redirect Abuse",
+    "open redirect": "Open Redirect Abuse",
+    "open redirector": "Open Redirect Abuse",
+    "redirect parameter chain": "Open Redirect Abuse",
+    # Suspicious Shortened URL
+    "suspicious shortened url": "Suspicious Shortened URL",
+    "shortened url": "Suspicious Shortened URL",
+    "url shortener": "Suspicious Shortened URL",
+    "cloaked url": "Suspicious Shortened URL",
+    "unresolved shortener": "Suspicious Shortened URL",
+    # Brand Impersonation
+    "brand impersonation": "Brand Impersonation",
+    "brand mimicry": "Brand Impersonation",
+    "company impersonation": "Brand Impersonation",
+    "logo spoofing": "Brand Impersonation",
+    "corporate impersonation": "Brand Impersonation",
+    # Government Impersonation
+    "government impersonation": "Government Impersonation",
+    "government/identity impersonation": "Government Impersonation",
+    "tax fraud": "Government Impersonation",
+    "irs impersonation": "Government Impersonation",
+    "law enforcement impersonation": "Government Impersonation",
+    "police impersonation": "Government Impersonation",
+    # Delivery Scam
+    "delivery scam": "Delivery Scam",
+    "delivery smishing": "Delivery Scam",
+    "courier scam": "Delivery Scam",
+    "postal scam": "Delivery Scam",
+    "package scam": "Delivery Scam",
+    "shipping scam": "Delivery Scam",
+    # Fake Job Scam
+    "fake job scam": "Fake Job Scam",
+    "fake job offer": "Fake Job Scam",
+    "job scam": "Fake Job Scam",
+    "recruitment scam": "Fake Job Scam",
+    "employment scam": "Fake Job Scam",
+    # Lottery/Prize Scam
+    "lottery/prize scam": "Lottery/Prize Scam",
+    "lottery/prize fraud": "Lottery/Prize Scam",
+    "lottery scam": "Lottery/Prize Scam",
+    "prize scam": "Lottery/Prize Scam",
+    "advance fee scam": "Lottery/Prize Scam",
+    "advance-fee scam": "Lottery/Prize Scam",
+    "lottery fraud": "Lottery/Prize Scam",
+    # Investment/Crypto Scam
+    "investment/crypto scam": "Investment/Crypto Scam",
+    "investment scam": "Investment/Crypto Scam",
+    "crypto scam": "Investment/Crypto Scam",
+    "cryptocurrency fraud": "Investment/Crypto Scam",
+    "pig butchering": "Investment/Crypto Scam",
+    "pig-butchering": "Investment/Crypto Scam",
+    "crypto investment scam": "Investment/Crypto Scam",
+    # Tech Support Scam
+    "tech support scam": "Tech Support Scam",
+    "tech support": "Tech Support Scam",
+    "fake antivirus": "Tech Support Scam",
+    "fake renewal": "Tech Support Scam",
+    # Friend/Family Impersonation
+    "friend/family impersonation": "Friend/Family Impersonation",
+    "family impersonation": "Friend/Family Impersonation",
+    "friend impersonation": "Friend/Family Impersonation",
+    "distressed relative": "Friend/Family Impersonation",
+    "grandparent scam": "Friend/Family Impersonation",
+    # Social Engineering
+    "social engineering": "Social Engineering",
+    "manipulation": "Social Engineering",
+    "pretexting": "Social Engineering",
+    "rapport exploitation": "Social Engineering",
+    # Urgency/Threat Manipulation
+    "urgency/threat manipulation": "Urgency/Threat Manipulation",
+    "urgency manipulation": "Urgency/Threat Manipulation",
+    "threat manipulation": "Urgency/Threat Manipulation",
+    "artificial urgency": "Urgency/Threat Manipulation",
+    "intimidation": "Urgency/Threat Manipulation",
+    "time pressure": "Urgency/Threat Manipulation",
+    "coercion": "Urgency/Threat Manipulation",
+    # Trust/Grooming Manipulation
+    "trust/grooming manipulation": "Trust/Grooming Manipulation",
+    "trust manipulation": "Trust/Grooming Manipulation",
+    "grooming manipulation": "Trust/Grooming Manipulation",
+    "grooming": "Trust/Grooming Manipulation",
+    "trust building": "Trust/Grooming Manipulation",
+    "rapport building": "Trust/Grooming Manipulation",
+}
+
+
+def normalize_attack_type(attack: str) -> Optional[str]:
+    """Normalize an attack technique string to one of the controlled taxonomy values."""
+    if not attack:
+        return None
+    raw = attack.strip()
+    raw_lower = raw.lower()
+
+    # Exact match in controlled taxonomy
+    for standard in CONTROLLED_ATTACK_TYPES:
+        if standard.lower() == raw_lower:
+            return standard
+
+    # Lookup in synonym dictionary
+    if raw_lower in ATTACK_TYPE_SYNONYMS:
+        return ATTACK_TYPE_SYNONYMS[raw_lower]
+
+    # Partial substring matching
+    for syn_key, standard_val in ATTACK_TYPE_SYNONYMS.items():
+        if syn_key in raw_lower:
+            return standard_val
+
+    return None
+
+
+def merge_attack_types(
+    deterministic_attacks: List[str],
+    gemini_attacks: Optional[List[str]] = None,
+) -> List[str]:
+    """Merge deterministic and Gemini attack types, normalizing synonyms and eliminating duplicates."""
+    seen = set()
+    result = []
+
+    # Deterministic signals take precedence to prevent LLM omissions
+    for attack in deterministic_attacks:
+        norm = normalize_attack_type(attack)
+        if norm and norm not in seen and norm in CONTROLLED_ATTACK_TYPES:
+            seen.add(norm)
+            result.append(norm)
+
+    # Incorporate Gemini attack types
+    if gemini_attacks:
+        for attack in gemini_attacks:
+            norm = normalize_attack_type(attack)
+            if norm and norm not in seen and norm in CONTROLLED_ATTACK_TYPES:
+                seen.add(norm)
+                result.append(norm)
+
+    return result
+
+
+def detect_attack_types(
+    raw_message: str = "",
+    urls_detected: Optional[List[UrlSignal]] = None,
+    conversation_tactics: Optional[ConversationTactics] = None,
+    offline_assessment: Optional[dict] = None,
+) -> List[str]:
+    """Deterministically detect multiple distinct attack techniques from raw text, URLs, and tactics."""
+    attacks: List[str] = []
+    msg_lower = (raw_message or "").lower()
+
+    # 1. Text-Based Attack Techniques
+
+    # OTP Theft
+    otp_terms = [
+        "otp", "one-time passcode", "one-time password", "one time passcode",
+        "one time password", "verification code", "security passcode", "6-digit code",
+        "authorization code"
+    ]
+    if any(t in msg_lower for t in otp_terms):
+        attacks.append("OTP Theft")
+
+    # Password/Account Credential Theft
+    pwd_terms = [
+        "password", "login credentials", "current password", "enter credentials",
+        "account credentials", "atm pin", "debit card pin", "credit card pin",
+        "account pin", "enter your pin", "enter pin"
+    ]
+    if any(p in msg_lower for p in pwd_terms):
+        attacks.append("Password/Account Credential Theft")
+
+    # Bank Impersonation
+    bank_entities = [
+        "chase", "wells fargo", "wellsfargo", "bank of america", "citi",
+        "sbi", "hdfc", "icici", "debit card", "credit card", "bank account",
+        "checking account", "bank alert"
+    ]
+    bank_actions = [
+        "unusual", "unauthorized", "blocked", "suspended", "locked", "unfreeze",
+        "verify", "fraud", "card activity", "compromised", "wire transfer", "atm"
+    ]
+    if any(e in msg_lower for e in bank_entities) and any(a in msg_lower for a in bank_actions):
+        attacks.append("Bank Impersonation")
+
+    # Government Impersonation
+    gov_terms = [
+        "internal revenue service", "irs", "tax refund", "arrest warrant",
+        "federal investigation", "court summons", "social security administration",
+        "tax notice", "federal marshals"
+    ]
+    if any(g in msg_lower for g in gov_terms):
+        attacks.append("Government Impersonation")
+
+    # Delivery Scam
+    deliv_entities = ["usps", "fedex", "dhl", "ups", "postal", "package", "shipment", "parcel"]
+    deliv_traps = [
+        "cannot be delivered", "redelivery", "missing street address", "customs",
+        "unpaid duty", "delivery fee", "held at warehouse", "reschedule"
+    ]
+    if any(e in msg_lower for e in deliv_entities) and any(t in msg_lower for t in deliv_traps):
+        attacks.append("Delivery Scam")
+
+    # Fake Job Scam
+    job_terms = [
+        "remote data entry", "$40/hr", "no interview needed", "telegram for interview",
+        "work from home $300", "work kit", "youtube video reviewer", "registration fee",
+        "part-time job", "earn $500", "shortlisted for part-time"
+    ]
+    if any(j in msg_lower for j in job_terms):
+        attacks.append("Fake Job Scam")
+
+    # Lottery/Prize Scam
+    lottery_terms = [
+        "won the international lottery", "claim your prize", "selected as the lucky winner",
+        "consignment trunk", "lottery winnings", "cashback reward of rs", "sweepstakes",
+        "mega uk lottery"
+    ]
+    if any(l in msg_lower for l in lottery_terms):
+        attacks.append("Lottery/Prize Scam")
+
+    # Investment / Crypto Scam
+    crypto_terms = [
+        "crypto", "bitcoin", "btc", "arbitrage pool", "trading bot",
+        "guaranteed 15%", "guaranteed daily", "high yield", "crypto trading",
+        "deposit bitcoin", "vip platform", "crypto staking", "deposit $500 now"
+    ]
+    if any(c in msg_lower for c in crypto_terms):
+        attacks.append("Investment/Crypto Scam")
+
+    # Tech Support Scam
+    tech_terms = [
+        "windows defender", "trojan spyware", "0x800", "financial files are compromised",
+        "call microsoft certified", "geek squad", "auto-renewed", "total tech", "virus detected"
+    ]
+    if any(t in msg_lower for t in tech_terms):
+        attacks.append("Tech Support Scam")
+
+    # Friend / Family Impersonation
+    distress_terms = [
+        "broke my phone", "lost my wallet at the airport", "friend's whatsapp",
+        "stranded and my flight", "send $650 via zelle", "hi mom", "hi dad"
+    ]
+    if any(d in msg_lower for d in distress_terms):
+        attacks.append("Friend/Family Impersonation")
+
+    # UPI / Payment Fraud
+    payment_terms = [
+        "wire transfer", "gift card", "zelle", "cashapp", "send money",
+        "transfer $", "send $", "deposit $", "wire $", "pay $"
+    ]
+    has_upi = "upi" in msg_lower and any(k in msg_lower for k in ["pin", "cashback", "paytm", "gpay", "phonepe", "bill", "disconnect", "reward"])
+    if has_upi or any(p in msg_lower for p in payment_terms):
+        attacks.append("UPI/Payment Fraud")
+
+    # Urgency / Threat Manipulation
+    urgency_terms = [
+        "immediately", "urgent", "within 24 hours", "within 12 hours", "within 2 hours",
+        "permanent suspension", "permanently blocked", "permanently closed",
+        "face immediate arrest", "arrest warrant", "final notice", "expire today",
+        "disconnected tonight", "action required", "act now", "unfreeze your card immediately",
+        "arrest by federal"
+    ]
+    if any(u in msg_lower for u in urgency_terms):
+        attacks.append("Urgency/Threat Manipulation")
+
+    # Trust / Grooming Manipulation
+    trust_terms = [
+        "wrong number", "kind person", "sorry to bother you", "meeting for coffee",
+        "are we meeting", "you seem so kind", "let's be friends"
+    ]
+    if any(tr in msg_lower for tr in trust_terms):
+        attacks.append("Trust/Grooming Manipulation")
+
+    # 2. Conversation Tactics Integration
+    if conversation_tactics:
+        if conversation_tactics.trust_building_observed:
+            attacks.append("Trust/Grooming Manipulation")
+            attacks.append("Social Engineering")
+        if conversation_tactics.urgency_escalation_observed:
+            attacks.append("Urgency/Threat Manipulation")
+            attacks.append("Social Engineering")
+        if conversation_tactics.payment_or_credential_demanded:
+            attacks.append("UPI/Payment Fraud")
+            attacks.append("Social Engineering")
+        if conversation_tactics.grooming_pattern:
+            attacks.append("Social Engineering")
+
+    # 3. URL-Based Attack Techniques
+    if urls_detected:
+        for u in urls_detected:
+            # Malicious Link
+            if u.is_suspicious or (u.reputation and u.reputation.status == PhishTankReputationStatus.KNOWN_PHISHING):
+                attacks.append("Malicious Link")
+
+            # Shortened URL
+            if u.is_shortened or any("shorten" in s.lower() for s in u.suspicious_signals):
+                attacks.append("Suspicious Shortened URL")
+
+            # URL Obfuscation
+            if u.is_obfuscated or any(
+                "obfuscat" in s.lower() or "percent-encoded" in s.lower() or "raw ip" in s.lower()
+                or "dword" in s.lower() or "hex" in s.lower() or "octal" in s.lower()
+                for s in u.suspicious_signals + u.zero_day_indicators
+            ):
+                attacks.append("URL Obfuscation")
+
+            # Punycode / Homograph
+            if any("punycode" in s.lower() or "xn--" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators) or ("xn--" in (u.domain or "")):
+                attacks.append("Punycode/IDN Homograph")
+
+            # Typosquatting
+            if any("typosquat" in s.lower() or "substitution" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators):
+                attacks.append("Typosquatting")
+                # If domain mimics bank brand, also trigger Bank Impersonation
+                host_l = (u.domain or "").lower()
+                if any(b in host_l for b in ["chase", "wellsfargo", "paypa1", "paypal", "citi", "bank"]):
+                    attacks.append("Bank Impersonation")
+
+            # Open Redirect
+            if any("open redirect" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators):
+                attacks.append("Open Redirect Abuse")
+
+            # Malicious Download
+            if any("executable" in s.lower() or "payload" in s.lower() or ".exe" in s.lower() or ".apk" in s.lower() or ".scr" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators):
+                attacks.append("Malicious Download")
+
+            # Brand vs Bank Impersonation from URL mimicry
+            if any("impersonat" in s.lower() or "mimic" in s.lower() for s in u.suspicious_signals):
+                host_l = (u.domain or "").lower()
+                if any(b in host_l for b in ["chase", "wellsfargo", "bankofamerica", "citi", "paypal", "paypa1"]):
+                    attacks.append("Bank Impersonation")
+                else:
+                    attacks.append("Brand Impersonation")
+
+    # 4. Credential Phishing Composite Check
+    if "OTP Theft" in attacks or "Password/Account Credential Theft" in attacks:
+        attacks.append("Credential Phishing")
+    if "Malicious Link" in attacks and any(k in (u.url or "").lower() for u in (urls_detected or []) for k in ["login", "signin", "auth", "verify", "account", "portal", "password"]):
+        attacks.append("Credential Phishing")
+
+    # 5. Offline Assessment Fallback Integration
+    if offline_assessment:
+        cat = offline_assessment.get("scam_category", "")
+        norm_cat = normalize_attack_type(cat)
+        if norm_cat:
+            attacks.append(norm_cat)
+
+    # 6. Social Engineering Composite Check
+    if "Trust/Grooming Manipulation" in attacks or "Urgency/Threat Manipulation" in attacks:
+        attacks.append("Social Engineering")
+
+    # Deduplicate preserving order
+    return merge_attack_types(attacks, None)
 
 
 def normalize_category(category: str, is_safe: bool = False) -> str:
@@ -120,6 +550,15 @@ def fuse_evidence(
         )
         for u in suspicious_urls
     ) or has_zero_day_markers or has_obfuscated_urls
+
+    # Extract deterministic multi-attack indicators across text, URLs, and tactics
+    active_tactics = conversation_tactics or (gemini_response.conversation_tactics if gemini_response else None)
+    det_attack_types = detect_attack_types(
+        raw_message=raw_message,
+        urls_detected=urls_detected,
+        conversation_tactics=active_tactics,
+        offline_assessment=offline_assessment,
+    )
 
     # =========================================================================
     # CASE A: Graceful Degradation (Gemini Failed, Unconfigured, or Offline)
@@ -259,6 +698,8 @@ def fuse_evidence(
             else (f"{len(urls_detected)} URL(s) detected with no local structural red flags" if urls_detected else "No URLs detected")
         )
 
+        final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(det_attack_types, None)
+
         return AnalysisResponse(
             risk_level=final_risk,
             scam_category=category,
@@ -274,6 +715,7 @@ def fuse_evidence(
                 heuristic_confidence=heuristic_conf,
             ),
             conversation_tactics=conversation_tactics,
+            attack_types=final_attack_types,
         )
 
     # =========================================================================
@@ -385,6 +827,9 @@ def fuse_evidence(
         heuristic_confidence=heuristic_conf,
     )
 
+    gemini_attacks = list(gemini_response.attack_types) if hasattr(gemini_response, "attack_types") and gemini_response.attack_types else []
+    final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(det_attack_types, gemini_attacks)
+
     return AnalysisResponse(
         risk_level=final_risk,
         scam_category=normalized_cat,
@@ -394,4 +839,5 @@ def fuse_evidence(
         urls_detected=urls_detected,
         evidence_summary=evidence_summary,
         conversation_tactics=conversation_tactics or (gemini_response.conversation_tactics if gemini_response else None),
+        attack_types=final_attack_types,
     )

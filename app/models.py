@@ -93,6 +93,32 @@ STANDARD_SCAM_CATEGORIES = [
     "Routine / Legitimate Communication",
 ]
 
+CONTROLLED_ATTACK_TYPES = [
+    "Bank Impersonation",
+    "Credential Phishing",
+    "UPI/Payment Fraud",
+    "OTP Theft",
+    "Password/Account Credential Theft",
+    "Malicious Download",
+    "Malicious Link",
+    "Typosquatting",
+    "Punycode/IDN Homograph",
+    "URL Obfuscation",
+    "Open Redirect Abuse",
+    "Suspicious Shortened URL",
+    "Brand Impersonation",
+    "Government Impersonation",
+    "Delivery Scam",
+    "Fake Job Scam",
+    "Lottery/Prize Scam",
+    "Investment/Crypto Scam",
+    "Tech Support Scam",
+    "Friend/Family Impersonation",
+    "Social Engineering",
+    "Urgency/Threat Manipulation",
+    "Trust/Grooming Manipulation",
+]
+
 
 class EvidenceSummary(BaseModel):
     gemini_assessment: str = Field(
@@ -201,4 +227,8 @@ class AnalysisResponse(BaseModel):
     conversation_tactics: Optional[ConversationTactics] = Field(
         default=None,
         description="Cumulative multi-turn tactics breakdown if analyzing a multi-message thread",
+    )
+    attack_types: List[str] = Field(
+        default_factory=list,
+        description="All distinct attack techniques detected in the analyzed content, not just the primary scam category",
     )

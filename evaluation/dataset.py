@@ -635,3 +635,123 @@ CONVERSATION_DATASET = [
         ]
     },
 ]
+
+# Multi-Attack Evaluation Dataset (10 Synthetic Cases)
+# Evaluates multi-attack detection coverage, individual technique identification, and benign calibration.
+MULTI_ATTACK_DATASET = [
+    {
+        "id": "MA01",
+        "name": "Bank Phishing + OTP Theft + Malicious Link + Urgency",
+        "text": "Chase Alert: Unusual card activity of $840 detected. Enter your one-time passcode (OTP) at http://chase-security-verify.net/auth immediately to unfreeze your card before it is permanently blocked.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Bank Impersonation",
+            "OTP Theft",
+            "Malicious Link",
+            "Credential Phishing",
+            "Urgency/Threat Manipulation"
+        ],
+    },
+    {
+        "id": "MA02",
+        "name": "Executable Download + Threat Urgency + Malicious Link",
+        "text": "FINAL WARNING: Your payroll invoice details must be reviewed immediately within 2 hours: http://shipping-documents-download.org/invoice_details.pdf.exe or legal action follows today!",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Malicious Download",
+            "Urgency/Threat Manipulation",
+            "Malicious Link"
+        ],
+    },
+    {
+        "id": "MA03",
+        "name": "Typosquatting + Bank Impersonation + OTP Theft",
+        "text": "PayPal Security: Suspicious login attempt from unknown device. Enter your verification OTP at https://paypa1-security.com/account to secure your login credentials.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Bank Impersonation",
+            "Typosquatting",
+            "OTP Theft",
+            "Credential Phishing",
+            "Malicious Link"
+        ],
+    },
+    {
+        "id": "MA04",
+        "name": "Delivery Smishing + Shortened URL + Payment Extortion",
+        "text": "USPS Notification: Package #9405 cannot be delivered due to missing address. Pay $1.85 redelivery fee within 24 hours at https://bit.ly/3xVerifyAccount or parcel is returned.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Delivery Scam",
+            "Suspicious Shortened URL",
+            "Malicious Link",
+            "UPI/Payment Fraud",
+            "Urgency/Threat Manipulation"
+        ],
+    },
+    {
+        "id": "MA05",
+        "name": "IRS Tax Fraud + Arrest Coercion + Payment Demand",
+        "text": "INTERNAL REVENUE SERVICE NOTICE: Federal tax fraud arrest warrant issued under your SSN. Settle $1,500 immediately via wire transfer or federal marshals will execute arrest within 2 hours.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Government Impersonation",
+            "UPI/Payment Fraud",
+            "Urgency/Threat Manipulation",
+            "Social Engineering"
+        ],
+    },
+    {
+        "id": "MA06",
+        "name": "Tech Support Scam + Artificial Renewal Threat",
+        "text": "Microsoft Defender Alert: Trojan spyware detected (Error 0x800). Your financial files are compromised. Auto-renewed for $499. Call Microsoft certified support immediately at 1-800-555-0199.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Tech Support Scam",
+            "Urgency/Threat Manipulation",
+            "Social Engineering"
+        ],
+    },
+    {
+        "id": "MA07",
+        "name": "Fake Job Scam + Advance Registration Fee Demand",
+        "text": "Congratulations! You are shortlisted for part-time remote data entry. Earn $300-$500 daily. Pay $35 registration fee via CashApp to receive equipment and begin.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Fake Job Scam",
+            "UPI/Payment Fraud"
+        ],
+    },
+    {
+        "id": "MA08",
+        "name": "Romance Crypto Investment Grooming + Payment Demand",
+        "text": "Oh I'm so sorry, wrong number! You seem so kind though. I trade automated crypto trading bots with 25% daily ROI. Send $500 via wire transfer to join our VIP pool today!",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "Investment/Crypto Scam",
+            "Social Engineering",
+            "Trust/Grooming Manipulation",
+            "UPI/Payment Fraud"
+        ],
+    },
+    {
+        "id": "MA09",
+        "name": "Obfuscated IP URL + Credential Phishing",
+        "text": "System Administrator: Your email account password expires today. Enter credentials at http://0x7f000001/bank/auth.php to retain access.",
+        "expected_risk": "HIGH",
+        "expected_attack_types": [
+            "URL Obfuscation",
+            "Malicious Link",
+            "Credential Phishing",
+            "Password/Account Credential Theft"
+        ],
+    },
+    {
+        "id": "MA10",
+        "name": "Legitimate Routine Workplace Communication",
+        "text": "Hi team, the quarterly performance slides are attached for our project sync meeting scheduled for 3 PM today. Please review beforehand.",
+        "expected_risk": "LOW",
+        "expected_attack_types": [],
+    },
+]
+
