@@ -1,0 +1,1034 @@
+{
+  "evaluation_type": "Synthetic Internal Evaluation Benchmark",
+  "timestamp": "2026-10-04 10:29:23 UTC",
+  "disclaimer": "This synthetic benchmark provides comparative metrics for development and validation. It does not represent real-world generalization or operational accuracy.",
+  "url_heuristics_evaluation": {
+    "metrics": {
+      "total": 40,
+      "true_positives": 20,
+      "false_positives": 0,
+      "true_negatives": 20,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "results": [
+      {
+        "id": "U01",
+        "url": "http://paypal-security-update.com",
+        "category": "phishing_brand_impersonation",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Brand impersonation: Mentions 'paypal' combined with security/action keywords (security, update) but does not belong to paypal.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U02",
+        "url": "http://chase-security-verify.net",
+        "category": "phishing_brand_impersonation",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Brand impersonation: Mentions 'chase' combined with security/action keywords (security, verify) but does not belong to chase.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U03",
+        "url": "http://192.168.1.150/bank/login.php",
+        "category": "raw_ip_phishing",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Host is a raw IP address rather than a registered domain name",
+          "Forbidden internal/private IP destination (192.168.1.150) detected (SSRF / internal network threat)"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U04",
+        "url": "https://usps-redelivery-portal.cc",
+        "category": "delivery_smishing_tld",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Uses top-level domain (.cc) with elevated fraud/phishing association",
+          "Brand impersonation: Mentions 'usps' combined with security/action keywords (portal, redelivery) but does not belong to usps.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U05",
+        "url": "http://apple-id-verify-alert.com",
+        "category": "credential_phishing",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (3 hyphens) typical of phishing domains",
+          "Brand impersonation: Mentions 'apple' combined with security/action keywords (verify, alert) but does not belong to apple.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U06",
+        "url": "http://netflix-billing-update.xyz",
+        "category": "phishing_tld",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Uses top-level domain (.xyz) with elevated fraud/phishing association",
+          "Brand impersonation: Mentions 'netflix' combined with security/action keywords (update) but does not belong to netflix.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U07",
+        "url": "https://wellsfargo-auth-portal.com",
+        "category": "bank_phishing",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Brand impersonation: Mentions 'wellsfargo' combined with security/action keywords (auth, portal) but does not belong to wellsfargo.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U08",
+        "url": "http://amazon-account-support.click",
+        "category": "ecommerce_phishing_tld",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Uses top-level domain (.click) with elevated fraud/phishing association",
+          "Brand impersonation: Mentions 'amazon' combined with security/action keywords (account, support) but does not belong to amazon.com"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U09",
+        "url": "http://irs-tax-refund-portal.net",
+        "category": "gov_impersonation",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (3 hyphens) typical of phishing domains",
+          "Brand impersonation: Mentions 'irs' combined with security/action keywords (portal) but does not belong to irs.gov"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U10",
+        "url": "https://google.com@phishingserver.top/login",
+        "category": "deceptive_url_structure",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Deceptive URL structure: Contains '@' symbol which can conceal the actual destination",
+          "Uses top-level domain (.top) with elevated fraud/phishing association"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U11",
+        "url": "https://www.google.com",
+        "category": "legitimate_search",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U12",
+        "url": "https://www.paypal.com",
+        "category": "legitimate_financial",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U13",
+        "url": "https://www.chase.com",
+        "category": "legitimate_bank",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U14",
+        "url": "https://www.amazon.com",
+        "category": "legitimate_ecommerce",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U15",
+        "url": "https://www.apple.com",
+        "category": "legitimate_tech",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U16",
+        "url": "https://www.microsoft.com",
+        "category": "legitimate_tech",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U17",
+        "url": "https://www.github.com",
+        "category": "legitimate_developer",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U18",
+        "url": "https://www.wikipedia.org",
+        "category": "legitimate_reference",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U19",
+        "url": "https://www.usps.com",
+        "category": "legitimate_postal",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U20",
+        "url": "https://www.netflix.com",
+        "category": "legitimate_streaming",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U21",
+        "url": "https://bit.ly/3xVerifyAccount",
+        "category": "shortened_url_concealment",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Shortened/cloaked URL (bit.ly): Destination host cannot be safely expanded or verified without risk (Shortener returned non-redirect status HTTP 404). Concealed destination quarantined with elevated caution."
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U22",
+        "url": "http://0x7f000001/bank/auth.php",
+        "category": "obfuscated_hex_ip",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Obfuscated IP host encoding (hex_integer_ip): Host uses encoded/non-standard IP '0x7f000001' (canonical: 127.0.0.1) to evade domain reputation filters",
+          "Forbidden internal/private IP destination (127.0.0.1) detected (SSRF / internal network threat)"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U23",
+        "url": "http://2130706433/login",
+        "category": "obfuscated_dword_ip",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Obfuscated IP host encoding (dword_integer_ip): Host uses encoded/non-standard IP '2130706433' (canonical: 127.0.0.1) to evade domain reputation filters",
+          "Forbidden internal/private IP destination (127.0.0.1) detected (SSRF / internal network threat)"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U24",
+        "url": "http://0177.0.0.1/verify",
+        "category": "obfuscated_octal_ip",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Obfuscated IP host encoding (dotted_obfuscated_ip): Host uses encoded/non-standard IP '0177.0.0.1' (canonical: 127.0.0.1) to evade domain reputation filters",
+          "Forbidden internal/private IP destination (127.0.0.1) detected (SSRF / internal network threat)"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U25",
+        "url": "https://xn--pypal-4ve.com/signin",
+        "category": "punycode_idn_homograph",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Excessive hyphenation in hostname (3 hyphens) typical of phishing domains",
+          "Punycode/IDN homograph domain detected (xn--) frequently used to spoof legitimate brand characters"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U26",
+        "url": "https://paypa1-security.com/account",
+        "category": "typosquatting_leetspeak",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Typosquatting/Homoglyph attack: Domain mimics 'paypal' with lookalike character substitution"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U27",
+        "url": "https://bank-verification.duckdns.org/login",
+        "category": "dynamic_dns_staging",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Disposable tunneling/dynamic DNS domain (duckdns.org) frequently abused for zero-day phishing staging"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U28",
+        "url": "https://urgent-payroll-update.ngrok-free.app/signin",
+        "category": "tunneling_service_abuse",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Excessive hyphenation in hostname (3 hyphens) typical of phishing domains",
+          "Disposable tunneling/dynamic DNS domain (ngrok-free.app) frequently abused for zero-day phishing staging"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U29",
+        "url": "http://secure-update-portal.com:8080/auth",
+        "category": "non_standard_port_evasion",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "Non-standard web port (:8080) commonly used in temporary zero-day phishing kits"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U30",
+        "url": "http://shipping-documents-download.org/invoice_details.pdf.exe",
+        "category": "executable_malware_payload",
+        "ground_truth": "SUSPICIOUS",
+        "prediction": "SUSPICIOUS",
+        "signals": [
+          "Insecure protocol: Uses unencrypted HTTP instead of HTTPS",
+          "Excessive hyphenation in hostname (2 hyphens) typical of phishing domains",
+          "URL targets executable/malware payload download (.exe) typical of smishing trojans"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "U31",
+        "url": "https://docs.google.com/document/d/1abc123/edit",
+        "category": "legitimate_cloud_docs",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U32",
+        "url": "https://auth.github.com",
+        "category": "legitimate_subdomain",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U33",
+        "url": "https://www.irs.gov/refunds",
+        "category": "legitimate_government",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U34",
+        "url": "https://secure.chase.com/statement",
+        "category": "legitimate_bank_portal",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U35",
+        "url": "https://developer.apple.com/documentation",
+        "category": "legitimate_tech_developer",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U36",
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0",
+        "category": "legitimate_cdn",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U37",
+        "url": "https://login.microsoftonline.com",
+        "category": "legitimate_identity_provider",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U38",
+        "url": "https://gitlab.com/projects",
+        "category": "legitimate_developer",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U39",
+        "url": "https://accounts.google.com/signin",
+        "category": "legitimate_auth",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      },
+      {
+        "id": "U40",
+        "url": "https://www.who.int/health-topics",
+        "category": "legitimate_international_org",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "signals": [],
+        "is_correct": true
+      }
+    ],
+    "false_positives": [],
+    "false_negatives": []
+  },
+  "degraded_mode_evaluation": {
+    "metrics": {
+      "total": 10,
+      "true_positives": 5,
+      "false_positives": 0,
+      "true_negatives": 5,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "results": [
+      {
+        "id": "D01",
+        "category": "bank_scam",
+        "text": "Wells Fargo Alert: Unusual debit card activity. Account suspended. Reply immediately with your 6-digit OTP to unblock.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Bank/Financial Impersonation",
+        "signals": [
+          "Impersonation of financial institution with threat of card/account suspension",
+          "Artificial urgency pressure to force immediate verification"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D02",
+        "category": "upi_fraud",
+        "text": "Electricity bill unpaid! Power will be disconnected tonight at 9:30 PM. Pay now via UPI to 9876543210@paytm.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "UPI Payment Fraud",
+        "signals": [
+          "Unsolicited UPI payment solicitation or fake cashback incentive",
+          "Fake utility disconnection threat to extort immediate payment"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D03",
+        "category": "delivery_smishing",
+        "text": "USPS: Package cannot be delivered due to missing street address. Update details and pay redelivery fee now.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Delivery Smishing",
+        "signals": [
+          "Delivery smishing: Impersonation of postal courier with missing address pretext",
+          "Demand for small redelivery or customs fee payment via unverified link"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D04",
+        "category": "fake_job",
+        "text": "Shortlisted for part-time data entry! Earn $300-$500/day. Send $35 registration fee via CashApp to get started.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Fake Job Offer",
+        "signals": [
+          "Unrealistic daily compensation promise for minimal entry-level tasks",
+          "Advance registration fee or kit charge demanded via consumer payment app"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D05",
+        "category": "tech_support",
+        "text": "Windows Defender detected trojan spyware (0x80070422). Financial files are compromised. Call Microsoft certified support at 1-888-555-0144.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Tech Support Scam",
+        "signals": [
+          "Counterfeit security alert or unauthorized subscription renewal notice",
+          "Toll-free telephone call trap typical of technical support scams"
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D06",
+        "category": "normal_family",
+        "text": "Hey dad, dinner was great tonight! Let me know if you want me to bring over the lawnmower on Saturday morning.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "signals": [
+          "No manipulation cues, fraudulent urgency, or credential demands detected."
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D07",
+        "category": "normal_work",
+        "text": "Hi Team, please find the quarterly performance slides attached for tomorrow's 10 AM sync. Let me know if you have any questions.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "signals": [
+          "No manipulation cues, fraudulent urgency, or credential demands detected."
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D08",
+        "category": "normal_appointment",
+        "text": "Reminder: Your dental appointment with Dr. Henderson is scheduled for Tuesday at 2:00 PM.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "signals": [
+          "No manipulation cues, fraudulent urgency, or credential demands detected."
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D09",
+        "category": "normal_transaction",
+        "text": "Your Starbucks order #492 is ready for pickup at the counter. Thank you for using mobile ordering!",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "signals": [
+          "No manipulation cues, fraudulent urgency, or credential demands detected."
+        ],
+        "is_correct": true
+      },
+      {
+        "id": "D10",
+        "category": "normal_delivery",
+        "text": "Amazon: Your package with the wireless mouse has been delivered to your front porch.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "signals": [
+          "No manipulation cues, fraudulent urgency, or credential demands detected."
+        ],
+        "is_correct": true
+      }
+    ],
+    "false_positives": [],
+    "false_negatives": []
+  },
+  "conversation_evaluation": {
+    "metrics": {
+      "total": 4,
+      "true_positives": 2,
+      "false_positives": 0,
+      "true_negatives": 2,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "results": [
+      {
+        "id": "C01",
+        "name": "Pig Butchering / Crypto Grooming Thread",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Investment/Crypto Scam",
+        "tactics": {
+          "trust_building_observed": true,
+          "urgency_escalation_observed": false,
+          "payment_or_credential_demanded": true,
+          "grooming_pattern": "Relationship trust-building and grooming trajectory followed by pivot to investment/financial solicitation (Pig Butchering / Romance scam)"
+        },
+        "is_correct": true
+      },
+      {
+        "id": "C02",
+        "name": "Urgent Arrest Extortion Thread",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Government/Identity Impersonation",
+        "tactics": {
+          "trust_building_observed": false,
+          "urgency_escalation_observed": true,
+          "payment_or_credential_demanded": true,
+          "grooming_pattern": "Escalating pressure and fear tactics paired with urgent payment or verification demand"
+        },
+        "is_correct": true
+      },
+      {
+        "id": "C03",
+        "name": "Legitimate Social Planning Thread",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "tactics": {
+          "trust_building_observed": false,
+          "urgency_escalation_observed": false,
+          "payment_or_credential_demanded": false,
+          "grooming_pattern": null
+        },
+        "is_correct": true
+      },
+      {
+        "id": "C04",
+        "name": "Legitimate Work Collaboration Thread",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Routine / Legitimate Communication",
+        "tactics": {
+          "trust_building_observed": false,
+          "urgency_escalation_observed": false,
+          "payment_or_credential_demanded": false,
+          "grooming_pattern": null
+        },
+        "is_correct": true
+      }
+    ],
+    "false_positives": [],
+    "false_negatives": []
+  },
+  "message_pipeline_evaluation": {
+    "completed_count": 30,
+    "total_attempted": 30,
+    "stopped_early": false,
+    "stop_reason": "",
+    "metrics": {
+      "total": 30,
+      "true_positives": 15,
+      "false_positives": 0,
+      "true_negatives": 15,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "results": [
+      {
+        "id": "M01",
+        "category": "bank_scam",
+        "text": "Chase Alert: Unusual debit card activity detected. $942.10 at Apple Store. If not you, verify immediately: http://chase-security-verify.net/auth or card will be permanently blocked.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Bank / Financial Impersonation",
+        "explanation": "This message is a classic financial phishing scam designed to steal your banking credentials and personal information. It uses scare tactics, claiming an unauthorized large purchase at the Apple Store and threatening to permanently block your card unless you act immediately. The link provided uses an unauthorized domain that mimics Chase but is completely fake and insecure.",
+        "is_correct": true
+      },
+      {
+        "id": "M02",
+        "category": "upi_fraud",
+        "text": "Dear customer, your electricity bill is unpaid. Power will be disconnected tonight at 9:30 PM. Pay now via UPI to 9876543210@paytm and share screenshot to avoid disconnection.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Utility Disconnection Scam",
+        "explanation": "This message is a classic utility disconnection scam designed to induce panic through a fake, imminent threat of power loss. Legitimate utility companies typically notify customers through official billing statements, mail, or secure online portals rather than demanding instant peer-to-peer UPI transfers to a personal or arbitrary number.",
+        "is_correct": true
+      },
+      {
+        "id": "M03",
+        "category": "fake_job",
+        "text": "Congratulations! You are shortlisted for Part-Time Data Entry / YouTube Video Reviewer. Earn $300-$500/day. Complete your registration fee of $35 via CashApp to receive work kit.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Fake Job Offer",
+        "explanation": "This message exhibits classic signs of a task scam or fake job offer. Legitimate employers will never require you to pay an upfront fee, registration charge, or buy a work kit using apps like CashApp in order to secure a job or receive work. The promise of high daily earnings for simple tasks like data entry or video review is a common hook used by fraudsters to steal money and financial information.",
+        "is_correct": true
+      },
+      {
+        "id": "M04",
+        "category": "lottery_fraud",
+        "text": "FINAL NOTICE: Your mobile number has won 1st prize in the Samsung Mega UK Lottery ($850,000). To release your prize check, email your passport copy and wire $150 processing fee to our claims manager.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Lottery / Prize Fraud",
+        "explanation": "This message is a classic advance-fee lottery scam. Legitimate companies never require you to pay money or send sensitive identity documents like a passport to claim a legitimate prize. Scammers use these tactics to steal your money via wire transfer and harvest your personal information for identity theft.",
+        "is_correct": true
+      },
+      {
+        "id": "M05",
+        "category": "delivery_scam",
+        "text": "USPS Tracking: Package #US940523849 cannot be delivered due to missing street address. Update address and pay $1.85 redelivery fee within 12 hours: http://usps-redelivery-portal.cc",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Package Delivery Smishing",
+        "explanation": "This message is a classic package delivery smishing scam. It attempts to create panic by claiming a package cannot be delivered, tricking you into clicking a malicious link to pay a small fee. The link uses a fraudulent domain that impersonates the United States Postal Service (USPS) but does not use the official usps.com domain.",
+        "is_correct": true
+      },
+      {
+        "id": "M06",
+        "category": "gov_impersonation",
+        "text": "INTERNAL REVENUE SERVICE NOTICE: An arrest warrant has been filed under your SSN for tax fraud. Call the Federal Investigation Bureau immediately at 800-555-0199 to settle penalties.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Government / Law Enforcement Impersonation",
+        "explanation": "This message is a classic government impersonation scam. Law enforcement agencies and the IRS never issue arrest warrants via text messages, nor do they demand immediate settlement over the phone under threat of arrest. Scammers use these high-pressure scare tactics to panic victims into revealing sensitive personal information or sending money.",
+        "is_correct": true
+      },
+      {
+        "id": "M07",
+        "category": "distress_scam",
+        "text": "Hi Dad, I broke my phone and lost my wallet at the airport. I'm messaging from a friend's WhatsApp. Can you please send $650 via Zelle to this number right away? I'm stranded and my flight is boarding soon.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Family Impersonation / Grandparent Scam",
+        "explanation": "This is a classic 'Family in Distress' scam (often called the 'Hi Dad' or emergency scam). Scammers pose as a child or relative claiming they lost their phone, wallet, or are stranded to induce panic and rush the victim into sending money before they can verify the story.",
+        "is_correct": true
+      },
+      {
+        "id": "M08",
+        "category": "credential_phishing",
+        "text": "Microsoft 365 Security: Your email account password expires today. Keep your current password and prevent email deactivation by logging in at: http://office365-password-portal.com",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Credential Phishing",
+        "explanation": "This message is a classic credential phishing attempt. It uses scare tactics, such as claiming your password will expire today and threatening account deactivation, to pressure you into clicking a link without thinking. The link points to a suspicious, unofficial website using unencrypted HTTP rather than a genuine Microsoft domain, designed to steal your login credentials.",
+        "is_correct": true
+      },
+      {
+        "id": "M09",
+        "category": "tech_support_scam",
+        "text": "WARNING: Windows Defender detected Trojan Spyware (0x80070422) on your computer. Your financial files are compromised. Do not restart. Call Microsoft certified support at 1-888-555-0144 immediately.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Tech Support Scam",
+        "explanation": "This message is a classic tech support scam. Microsoft and other major technology companies never send popup warnings or SMS alerts demanding that you call a phone number to fix a virus or malware. Scammers use fear tactics, fake error codes, and urgency to trick victims into calling them, where they will then attempt to gain remote access to your computer, steal your personal information, or charge hundreds of dollars for fake software repairs.",
+        "is_correct": true
+      },
+      {
+        "id": "M10",
+        "category": "bank_scam",
+        "text": "Wells Fargo: A transfer of $1,200.00 was requested. If this wasn't you, reply STOP and immediately share the 6-digit one-time passcode sent to your mobile to reverse the transaction.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Bank / Financial Impersonation",
+        "explanation": "This message is a classic account takeover or financial phishing scam. Fraudsters send alarming alerts about unauthorized money transfers to panic the victim into taking immediate action. The critical threat is the demand for your 6-digit one-time passcode (OTP); legitimate banks will never ask you to disclose an OTP over SMS, chat, or phone. Providing this code will grant the scammer full access to your account and funds.",
+        "is_correct": true
+      },
+      {
+        "id": "M11",
+        "category": "upi_fraud",
+        "text": "Google Pay Bonus: You have received a cashback reward of Rs 2,999. Click the link, enter your UPI PIN on the payment screen to deposit money into your bank account immediately: http://gpay-cashback-claim.xyz",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Bank / Financial Impersonation",
+        "explanation": "This message is a classic UPI cashback phishing scam. Legitimate payment apps like Google Pay never require you to enter your secret UPI PIN to receive money or cashback; your PIN is only required when you are sending money or making a payment. The link leads to a fraudulent website designed to steal your UPI credentials and compromise your bank account.",
+        "is_correct": true
+      },
+      {
+        "id": "M12",
+        "category": "delivery_scam",
+        "text": "FedEx Delivery Update: Your shipment #FX-883921 is held at customs warehouse due to unpaid duty tax ($2.40). Pay now to resume shipping: http://fedex-customs-clearance.cc",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Package Delivery Smishing",
+        "explanation": "This message is a classic package delivery scam (smishing). Scammers impersonate major shipping companies like FedEx to trick victims into clicking a malicious link under the guise of paying a nominal customs fee ($2.40). Once the victim clicks the link, they are directed to a phishing site designed to steal personal information, billing details, or credit card credentials.",
+        "is_correct": true
+      },
+      {
+        "id": "M13",
+        "category": "crypto_fraud",
+        "text": "VIP Crypto Signals: Join our exclusive Binance arbitrage pool. Guaranteed 15% daily return with zero risk. Send minimum 0.05 BTC to wallet bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh to activate trading bot.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Cryptocurrency Investment Scam",
+        "explanation": "This message exhibits classic characteristics of a cryptocurrency investment scam. Promises of guaranteed daily returns with zero risk are mathematically impossible in financial markets. Scammers frequently use phrases like 'VIP Crypto Signals' and arbitrage pools to trick victims into sending cryptocurrency to uncontrolled wallet addresses under the guise of activating a trading bot.",
+        "is_correct": true
+      },
+      {
+        "id": "M14",
+        "category": "romance_fraud",
+        "text": "Dearest, I have been deployed overseas on a peacekeeping mission and cannot access my account. The military courier is holding my trunk of gold bullion. Can you wire $800 to the customs agent to clear it?",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Advanced Fee / Military Romance Scam",
+        "explanation": "This message is a classic advance-fee scam, often associated with romance or military impersonation scams. The fraudster claims to possess a large amount of wealth (gold bullion) that is inaccessible, then asks the victim to send relatively small sums of money (via wire transfer) to pay fictitious fees or customs charges. Once money is sent, the scammers invent new fees until the victim realizes they are being defrauded.",
+        "is_correct": true
+      },
+      {
+        "id": "M15",
+        "category": "tech_support_scam",
+        "text": "Geek Squad Renewal: We have auto-renewed your 3-year Total Tech protection plan for $499.99 from your registered credit card. If you did not authorize this charge, call our billing cancellation department at 888-555-0182.",
+        "ground_truth": "SCAM",
+        "prediction": "SCAM",
+        "predicted_risk": "HIGH",
+        "scam_category": "Tech Support Scam",
+        "explanation": "This message is a classic tech support / billing scam. The fraudsters send fake invoices or renewal notices for large amounts (like $499.99 for a multi-year Geek Squad plan) to cause panic. When you call the provided phone number, scammers pretend to be billing agents and trick you into granting remote access to your computer, installing malware, or paying fake cancellation or refund fees.",
+        "is_correct": true
+      },
+      {
+        "id": "M16",
+        "category": "normal_family",
+        "text": "Hey dad, dinner was great tonight! Let me know if you want me to bring over the lawnmower on Saturday morning.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a normal, personal text exchange between family members about dinner and weekend plans. There are no signs of fraud, phishing, or malicious intent.",
+        "is_correct": true
+      },
+      {
+        "id": "M17",
+        "category": "normal_work",
+        "text": "Hi Team, please find the quarterly performance slides attached for tomorrow's 10 AM sync. Let me know if you have any questions before then.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a standard, routine professional communication regarding a team meeting and performance slides. It lacks any typical indicators of fraud, phishing, or social engineering.",
+        "is_correct": true
+      },
+      {
+        "id": "M18",
+        "category": "normal_transaction",
+        "text": "Your Starbucks order #492 is ready for pickup at the counter. Thank you for using mobile ordering!",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a legitimate notification regarding a food and beverage order pickup. It does not contain any urgent threats, requests for personal or financial information, or suspicious links.",
+        "is_correct": true
+      },
+      {
+        "id": "M19",
+        "category": "normal_appointment",
+        "text": "Reminder: Your dental appointment with Dr. Henderson is scheduled for Tuesday, Oct 14 at 2:00 PM. Reply 1 to confirm or call 555-0123 to reschedule.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a routine, legitimate appointment reminder from a dental office. It provides standard details, asks for a simple reply to confirm, or offers a direct phone number to call for rescheduling without any pressure tactics, credential harvesting, or suspicious links.",
+        "is_correct": true
+      },
+      {
+        "id": "M20",
+        "category": "normal_delivery",
+        "text": "Amazon: Your package with the wireless mouse has been delivered to your front porch. View order details in your Amazon app.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message is a standard delivery notification from Amazon. It does not contain any urgent threats, requests for sensitive personal information, or external links leading to unknown websites. Instead, it correctly advises checking the official Amazon app to view details, which is a secure practice.",
+        "is_correct": true
+      },
+      {
+        "id": "M21",
+        "category": "normal_service",
+        "text": "Your monthly Spotify Premium subscription has renewed successfully for $11.99. View your receipt anytime in your account settings.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message is a standard transactional notification regarding a routine subscription renewal. It contains no links, asks for no sensitive information or credentials, and does not exhibit any urgency tactics commonly associated with financial phishing.",
+        "is_correct": true
+      },
+      {
+        "id": "M22",
+        "category": "normal_work",
+        "text": "Thanks for sending over the drafts, Karen. I reviewed section 3 and left a few comments on Google Docs. Overall looks solid.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a normal, benign workplace or collaborative exchange regarding document drafts. It contains no typical signs of social engineering, phishing, or fraud.",
+        "is_correct": true
+      },
+      {
+        "id": "M23",
+        "category": "normal_family",
+        "text": "Grandma says thank you so much for the birthday flowers! She absolutely loved the yellow tulips.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "The message is a benign, friendly communication expressing gratitude for birthday flowers. There are no links, requests for sensitive information, financial demands, or impersonation tactics detected.",
+        "is_correct": true
+      },
+      {
+        "id": "M24",
+        "category": "normal_transaction",
+        "text": "Your Uber ride with driver Marcus has completed. Your total receipt of $16.42 has been charged to your card ending in 4120.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message mimics a routine transaction receipt typically sent by ridesharing services like Uber. Because it does not contain any links, phone numbers to call, or requests for sensitive information, it poses no immediate security risk.",
+        "is_correct": true
+      },
+      {
+        "id": "M25",
+        "category": "normal_education",
+        "text": "Campus alert: The main university library will observe reduced hours during midterm break, closing at 6:00 PM on Friday.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a routine informational campus announcement regarding library hours. It contains no deceptive elements, manipulative tactics, or links typically associated with phishing or social engineering.",
+        "is_correct": true
+      },
+      {
+        "id": "M26",
+        "category": "normal_social",
+        "text": "Are you free for coffee around 3 PM today? Let me know if that works or if tomorrow is better for you!",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message is a standard, friendly inquiry about meeting for coffee. It contains no links, requests for sensitive information, financial demands, or urgent threats, making it safe and routine.",
+        "is_correct": true
+      },
+      {
+        "id": "M27",
+        "category": "normal_utility",
+        "text": "Your monthly water utility bill of $42.50 is now available online. Automatic payment will be processed on Oct 25.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a standard, routine notification from a utility provider about an upcoming automatic payment. It does not contain any links, urgent threats, or requests for personal or financial information, which are typical characteristics of phishing scams.",
+        "is_correct": true
+      },
+      {
+        "id": "M28",
+        "category": "normal_flight",
+        "text": "United Airlines: Flight UA 442 to Chicago O'Hare is on time. Gate departure is B12. Boarding begins at 4:15 PM.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message is a routine, informative notification regarding a flight status. It contains no links, no phone numbers to call, and no urgency tactics or requests for sensitive information, which are typical hallmarks of travel scams.",
+        "is_correct": true
+      },
+      {
+        "id": "M29",
+        "category": "normal_restaurant",
+        "text": "Your reservation at Trattoria Bella for a party of 4 on Friday at 7:30 PM is confirmed. See you soon!",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "This message appears to be a standard, routine confirmation for a restaurant reservation. It does not contain any urgent threats, requests for sensitive personal or financial information, or suspicious links.",
+        "is_correct": true
+      },
+      {
+        "id": "M30",
+        "category": "normal_personal",
+        "text": "Just landed safely in Seattle! Grabbing my luggage now and heading to the hotel. Will call you once I check in.",
+        "ground_truth": "LEGITIMATE",
+        "prediction": "LEGITIMATE",
+        "predicted_risk": "LOW",
+        "scam_category": "Legitimate / Low Risk",
+        "explanation": "The message is a standard, benign travel update from an acquaintance or family member letting you know they have landed safely. There are no elements typical of phishing, scams, or social engineering.",
+        "is_correct": true
+      }
+    ],
+    "false_positives": [],
+    "false_negatives": []
+  }
+}
