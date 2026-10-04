@@ -392,5 +392,42 @@ class TestMultiAttackDetection(unittest.TestCase):
         self.assertEqual(fused.attack_types, [])
 
 
+    def test_11_api_analyze_sbi_phishing_attack_types(self):
+        """Regression Test 5: Verify /api/analyze endpoint returns attack_types array for SBI phishing test."""
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        client = TestClient(app)
+        raw_msg = (
+            "URGENT: Your SBI account is restricted. Verify immediately at "
+            "http://sbi.co.in.auth-verify.top/login?redirect=http://attacker.top/stealer. "
+            "Enter your password, ATM PIN and OTP to restore access."
+        )
+        response = client.post("/api/analyze", json={"message": raw_msg})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        # 1. Verify attack_types property exists and is a list
+        self.assertIn("attack_types", data)
+        self.assertIsInstance(data["attack_types"], list)
+
+        # 2. Verify key attack techniques are detected
+        expected_techniques = [
+            "Bank Impersonation",
+            "OTP Theft",
+            "Password/Account Credential Theft",
+            "Credential Phishing",
+            "Malicious Link",
+            "Open Redirect Abuse",
+            "Urgency/Threat Manipulation",
+        ]
+        for tech in expected_techniques:
+            self.assertIn(tech, data["attack_types"])
+
+        # 3. Ensure no false positive payment fraud
+        self.assertNotIn("UPI/Payment Fraud", data["attack_types"])
+
+
 if __name__ == "__main__":
     unittest.main()
+
