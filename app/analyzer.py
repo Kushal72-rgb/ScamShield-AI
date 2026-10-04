@@ -77,6 +77,9 @@ Guidelines for Analysis:
      * Urgency/Threat Manipulation
      * Trust/Grooming Manipulation
    - Note: The `scam_category` remains the single PRIMARY category for the communication.
+   - CRITICAL TAXONOMY DISTINCTION:
+     * "UPI/Payment Fraud" requires explicit financial payment, transfer, or money demand (e.g. UPI transfer, paying fees, QR code scanning, sending money).
+     * Do NOT classify credential solicitations (passwords, ATM PIN, OTP requests, account verification) as "UPI/Payment Fraud". Credential theft and payment fraud are separate techniques.
 """
 
 SCREENSHOT_SYSTEM_PROMPT = """You are ScamShield AI, an expert cybersecurity and fraud detection analyst specializing in multimodal inspection of digital screenshots.

@@ -606,11 +606,18 @@ function renderResults(data) {
   actionText.textContent = data.recommended_action || "Stay vigilant.";
 
   // Render Attack Techniques Detected
+  const attackTypes = Array.isArray(data.attack_types) ? data.attack_types : [];
+  const attackTechniquesBlock = document.getElementById("attackTechniquesBlock");
+  const attackTypesContainer = document.getElementById("attackTypesContainer");
+
+  if (attackTechniquesBlock) {
+    attackTechniquesBlock.classList.remove("hidden");
+  }
+
   if (attackTypesContainer) {
     attackTypesContainer.innerHTML = "";
-    const attacks = Array.isArray(data.attack_types) ? data.attack_types : [];
-    if (attacks.length > 0) {
-      attacks.forEach(attack => {
+    if (attackTypes.length > 0) {
+      attackTypes.forEach(attack => {
         const badge = document.createElement("span");
         badge.className = "attack-technique-badge";
         badge.textContent = attack;

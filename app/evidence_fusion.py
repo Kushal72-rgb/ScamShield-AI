@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import List, Optional
 
 from app.models import (
@@ -204,18 +205,125 @@ def normalize_attack_type(attack: str) -> Optional[str]:
     return None
 
 
+def has_payment_evidence(
+    raw_message: str = "",
+    urls_detected: Optional[List[UrlSignal]] = None,
+    conversation_tactics: Optional[ConversationTactics] = None,
+) -> bool:
+    """Verify whether explicit payment or financial-transfer evidence is present.
+
+    UPI/Payment Fraud requires explicit financial-transfer evidence such as:
+    - UPI
+    - payment / pay
+    - transfer / bank transfer
+    - send money
+    - deposit
+    - transaction (in payment context)
+    - QR code
+    - wallet
+    - beneficiary
+    - account number when used in a payment context
+
+    Do NOT classify these alone as UPI/Payment Fraud:
+    - OTP request
+    - password request
+    - ATM PIN request
+    - account verification
+    - login credentials
+    """
+    msg_lower = (raw_message or "").lower()
+
+    # 1. Explicit UPI markers (standalone 'upi' or handles like @paytm, @okaxis, etc.)
+    if re.search(r"\bupi\b|@(paytm|okaxis|oksbi|okhdfcbank|ybl|axl|ibl|upi)\b", msg_lower):
+        return True
+
+    # 2. Payment apps / platforms
+    if re.search(r"\b(paytm|phonepe|gpay|google\s*pay|zelle|cashapp|venmo)\b", msg_lower):
+        return True
+
+    # 3. QR code
+    if re.search(r"\bqr\s*code\b|\bscan\s+(?:the\s+|this\s+)?qr\b", msg_lower):
+        return True
+
+    # 4. Explicit pay / payment words (avoid false positives like "pay attention" or "password")
+    if re.search(r"\b(payment|pay|paying|paid|payable)\b", msg_lower):
+        if "pay attention" in msg_lower and not re.search(r"\b(payment|fee|amount|money|cash|bill|due|fine|rs|₹|\$)\b", msg_lower):
+            pass
+        else:
+            return True
+
+    # 5. Money transfer terms
+    if re.search(r"\b(transfer|transferred|transferring|wire|bank\s*transfer|wire\s*transfer|remit|remittance)\b", msg_lower):
+        return True
+
+    # 6. Send money / Send cash / Send funds / Send currency
+    if re.search(r"\bsend\s+(?:money|cash|funds|amount|\$|₹|rs\.?|inr|usd|\d+)", msg_lower):
+        return True
+
+    # 7. Deposit terms
+    if re.search(r"\b(deposit|depositing|deposited)\b", msg_lower):
+        return True
+
+    # 8. Wallet terms
+    if re.search(r"\b(wallet|e-wallet|crypto\s*wallet)\b", msg_lower):
+        return True
+
+    # 9. Beneficiary terms
+    if re.search(r"\bbeneficiary\b", msg_lower):
+        return True
+
+    # 10. Transaction when used in payment context
+    if "transaction" in msg_lower and any(w in msg_lower for w in ["fee", "charge", "reverse", "failed", "pending", "amount", "debit", "credit", "unauthorized transaction", "transaction of"]):
+        return True
+
+    # 11. Account number when used in a payment context
+    if "account number" in msg_lower and any(w in msg_lower for w in ["transfer", "send", "deposit", "pay", "credit", "beneficiary", "wire", "remit"]):
+        return True
+
+    # 12. Specific payment demand patterns with amounts: e.g. "send 5000", "pay $50", "settle $1,500"
+    if re.search(r"\b(?:pay|send|wire|transfer|settle|deposit|remit)\s+(?:₹|rs\.?|\$|inr|usd)?\s*[\d,]+", msg_lower):
+        return True
+    if re.search(r"(?:₹|rs\.?|\$|inr|usd)\s*[\d,]+\s*(?:fee|charge|penalty|due|fine|redelivery|registration|deposit)", msg_lower):
+        return True
+
+    # 13. Specific fee demands: redelivery fee, registration fee, courier fee
+    if re.search(r"\b(redelivery\s+fee|registration\s+fee|courier\s+fee|processing\s+fee|redelivery\s+charge|unpaid\s+bill)\b", msg_lower):
+        return True
+
+    # 14. Conversation tactics explicitly demanding payment
+    if conversation_tactics and conversation_tactics.payment_or_credential_demanded:
+        if any(term in msg_lower for term in ["$", "₹", "rs", "pay", "deposit", "wire", "transfer", "crypto", "card", "gift", "fee"]):
+            return True
+
+    return False
+
+
 def merge_attack_types(
     deterministic_attacks: List[str],
     gemini_attacks: Optional[List[str]] = None,
+    raw_message: str = "",
+    urls_detected: Optional[List[UrlSignal]] = None,
+    conversation_tactics: Optional[ConversationTactics] = None,
 ) -> List[str]:
     """Merge deterministic and Gemini attack types, normalizing synonyms and eliminating duplicates."""
     seen = set()
     result = []
 
+    # If raw_message is provided, evaluate whether explicit payment/transfer evidence exists
+    payment_allowed = True
+    if raw_message:
+        payment_allowed = has_payment_evidence(
+            raw_message=raw_message,
+            urls_detected=urls_detected,
+            conversation_tactics=conversation_tactics,
+        )
+
     # Deterministic signals take precedence to prevent LLM omissions
     for attack in deterministic_attacks:
         norm = normalize_attack_type(attack)
         if norm and norm not in seen and norm in CONTROLLED_ATTACK_TYPES:
+            if norm == "UPI/Payment Fraud" and not payment_allowed:
+                continue
             seen.add(norm)
             result.append(norm)
 
@@ -224,6 +332,8 @@ def merge_attack_types(
         for attack in gemini_attacks:
             norm = normalize_attack_type(attack)
             if norm and norm not in seen and norm in CONTROLLED_ATTACK_TYPES:
+                if norm == "UPI/Payment Fraud" and not payment_allowed:
+                    continue
                 seen.add(norm)
                 result.append(norm)
 
@@ -335,13 +445,20 @@ def detect_attack_types(
         attacks.append("Friend/Family Impersonation")
 
     # UPI / Payment Fraud
-    payment_terms = [
-        "wire transfer", "gift card", "zelle", "cashapp", "send money",
-        "transfer $", "send $", "deposit $", "wire $", "pay $"
-    ]
-    has_upi = "upi" in msg_lower and any(k in msg_lower for k in ["pin", "cashback", "paytm", "gpay", "phonepe", "bill", "disconnect", "reward"])
-    if has_upi or any(p in msg_lower for p in payment_terms):
+    # Tightened: requires explicit payment / financial-transfer evidence.
+    # Requests for OTP, password, ATM PIN, or account verification alone
+    # must NEVER be classified as UPI/Payment Fraud.
+    if has_payment_evidence(raw_message, urls_detected, conversation_tactics):
         attacks.append("UPI/Payment Fraud")
+
+    # Malicious Download (text cues)
+    download_cues = [
+        "download the security", "download app", "download apk", "install app",
+        "download the tool", "download security tool", "install the tool",
+        "download update", "download software", "download attachment", "download file"
+    ]
+    if any(dc in msg_lower for dc in download_cues):
+        attacks.append("Malicious Download")
 
     # Urgency / Threat Manipulation
     urgency_terms = [
@@ -371,7 +488,8 @@ def detect_attack_types(
             attacks.append("Urgency/Threat Manipulation")
             attacks.append("Social Engineering")
         if conversation_tactics.payment_or_credential_demanded:
-            attacks.append("UPI/Payment Fraud")
+            if has_payment_evidence(raw_message, urls_detected, conversation_tactics):
+                attacks.append("UPI/Payment Fraud")
             attacks.append("Social Engineering")
         if conversation_tactics.grooming_pattern:
             attacks.append("Social Engineering")
@@ -408,7 +526,7 @@ def detect_attack_types(
                     attacks.append("Bank Impersonation")
 
             # Open Redirect
-            if any("open redirect" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators):
+            if any("open redirect" in s.lower() for s in u.suspicious_signals + u.zero_day_indicators) or re.search(r"[?&](?:redirect|url|dest|destination|return|next|goto|target|rdir|link)=https?://", u.url or "", re.IGNORECASE):
                 attacks.append("Open Redirect Abuse")
 
             # Malicious Download
@@ -434,14 +552,23 @@ def detect_attack_types(
         cat = offline_assessment.get("scam_category", "")
         norm_cat = normalize_attack_type(cat)
         if norm_cat:
-            attacks.append(norm_cat)
+            if norm_cat == "UPI/Payment Fraud" and not has_payment_evidence(raw_message, urls_detected, conversation_tactics):
+                pass  # Suppress false positive UPI/Payment Fraud from offline assessment
+            else:
+                attacks.append(norm_cat)
 
     # 6. Social Engineering Composite Check
     if "Trust/Grooming Manipulation" in attacks or "Urgency/Threat Manipulation" in attacks:
         attacks.append("Social Engineering")
 
     # Deduplicate preserving order
-    return merge_attack_types(attacks, None)
+    return merge_attack_types(
+        attacks,
+        None,
+        raw_message=raw_message,
+        urls_detected=urls_detected,
+        conversation_tactics=conversation_tactics,
+    )
 
 
 def normalize_category(category: str, is_safe: bool = False) -> str:
@@ -698,7 +825,13 @@ def fuse_evidence(
             else (f"{len(urls_detected)} URL(s) detected with no local structural red flags" if urls_detected else "No URLs detected")
         )
 
-        final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(det_attack_types, None)
+        final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(
+            det_attack_types,
+            None,
+            raw_message=raw_message,
+            urls_detected=urls_detected,
+            conversation_tactics=conversation_tactics,
+        )
 
         return AnalysisResponse(
             risk_level=final_risk,
@@ -828,7 +961,13 @@ def fuse_evidence(
     )
 
     gemini_attacks = list(gemini_response.attack_types) if hasattr(gemini_response, "attack_types") and gemini_response.attack_types else []
-    final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(det_attack_types, gemini_attacks)
+    final_attack_types = [] if final_risk == RiskLevel.LOW else merge_attack_types(
+        det_attack_types,
+        gemini_attacks,
+        raw_message=raw_message,
+        urls_detected=urls_detected,
+        conversation_tactics=conversation_tactics,
+    )
 
     return AnalysisResponse(
         risk_level=final_risk,

@@ -275,6 +275,122 @@ class TestMultiAttackDetection(unittest.TestCase):
             ["Bank Impersonation", "OTP Theft", "Urgency/Threat Manipulation"],
         )
 
+    def test_7_bank_credentials_otp_redirect_no_upi_fraud(self):
+        """Regression Test 1: Bank + password + ATM PIN + OTP + suspicious URL with open redirect.
+        Expected:
+        - Bank Impersonation
+        - OTP Theft
+        - Password/Account Credential Theft
+        - Credential Phishing
+        - Malicious Link
+        - Open Redirect Abuse
+        - Urgency/Threat Manipulation
+        Must NOT contain:
+        - UPI/Payment Fraud
+        """
+        raw_msg = (
+            "URGENT: Your SBI account is restricted. Verify immediately at "
+            "http://sbi.co.in.auth-verify.top/login?redirect=http://attacker.top/stealer. "
+            "Enter your password, ATM PIN and OTP to restore access."
+        )
+        url_signal = analyze_url(
+            "http://sbi.co.in.auth-verify.top/login?redirect=http://attacker.top/stealer"
+        )
+
+        # Test deterministic detection directly
+        det = detect_attack_types(raw_message=raw_msg, urls_detected=[url_signal])
+        self.assertIn("Bank Impersonation", det)
+        self.assertIn("OTP Theft", det)
+        self.assertIn("Password/Account Credential Theft", det)
+        self.assertIn("Credential Phishing", det)
+        self.assertIn("Malicious Link", det)
+        self.assertIn("Open Redirect Abuse", det)
+        self.assertIn("Urgency/Threat Manipulation", det)
+        self.assertNotIn("UPI/Payment Fraud", det)
+
+        # Also test fuse_evidence (even if gemini hallucinated UPI/Payment Fraud)
+        gemini_mock = AnalysisResponse(
+            risk_level=RiskLevel.HIGH,
+            scam_category="Bank/Financial Impersonation",
+            suspicious_indicators=["Bank alert", "OTP requested", "ATM PIN requested"],
+            explanation="Phishing lure harvesting bank credentials.",
+            recommended_action="Do not enter credentials.",
+            urls_detected=[url_signal],
+            attack_types=["Bank Impersonation", "UPI/Payment Fraud", "OTP Theft"],
+        )
+        fused = fuse_evidence(
+            gemini_response=gemini_mock,
+            urls_detected=[url_signal],
+            raw_message=raw_msg,
+        )
+        self.assertIn("Bank Impersonation", fused.attack_types)
+        self.assertIn("OTP Theft", fused.attack_types)
+        self.assertIn("Password/Account Credential Theft", fused.attack_types)
+        self.assertIn("Credential Phishing", fused.attack_types)
+        self.assertIn("Malicious Link", fused.attack_types)
+        self.assertIn("Open Redirect Abuse", fused.attack_types)
+        self.assertIn("Urgency/Threat Manipulation", fused.attack_types)
+        self.assertNotIn("UPI/Payment Fraud", fused.attack_types)
+
+    def test_8_actual_payment_scam_has_upi_payment_fraud(self):
+        """Regression Test 2: Actual payment scam.
+        'Send ₹5,000 via UPI to this QR code immediately.'
+        Expected:
+        - UPI/Payment Fraud
+        """
+        raw_msg = "Send ₹5,000 via UPI to this QR code immediately."
+        det = detect_attack_types(raw_message=raw_msg, urls_detected=[])
+        self.assertIn("UPI/Payment Fraud", det)
+
+        fused = fuse_evidence(
+            gemini_response=None,
+            urls_detected=[],
+            raw_message=raw_msg,
+            gemini_error="503 Service Unavailable",
+        )
+        self.assertIn("UPI/Payment Fraud", fused.attack_types)
+
+    def test_9_credential_only_scam_no_payment_fraud(self):
+        """Regression Test 3: Credential-only scam.
+        'Enter your password and OTP to verify your account.'
+        Expected credential/OTP techniques but NOT UPI/Payment Fraud.
+        """
+        raw_msg = "Enter your password and OTP to verify your account."
+        det = detect_attack_types(raw_message=raw_msg, urls_detected=[])
+        self.assertIn("OTP Theft", det)
+        self.assertIn("Password/Account Credential Theft", det)
+        self.assertIn("Credential Phishing", det)
+        self.assertNotIn("UPI/Payment Fraud", det)
+
+        fused = fuse_evidence(
+            gemini_response=None,
+            urls_detected=[],
+            raw_message=raw_msg,
+            gemini_error="503 Service Unavailable",
+        )
+        self.assertIn("OTP Theft", fused.attack_types)
+        self.assertIn("Password/Account Credential Theft", fused.attack_types)
+        self.assertIn("Credential Phishing", fused.attack_types)
+        self.assertNotIn("UPI/Payment Fraud", fused.attack_types)
+
+    def test_10_legitimate_message_empty_attack_types_regression(self):
+        """Regression Test 4: Legitimate message.
+        Expected:
+        attack_types == []
+        """
+        raw_msg = "Good morning! Are we still having our weekly team standup at 10 AM today?"
+        fused = fuse_evidence(
+            gemini_response=None,
+            urls_detected=[],
+            raw_message=raw_msg,
+            offline_assessment={
+                "risk_level": "LOW",
+                "scam_category": "Routine / Legitimate Communication",
+            },
+        )
+        self.assertEqual(fused.risk_level, RiskLevel.LOW)
+        self.assertEqual(fused.attack_types, [])
+
 
 if __name__ == "__main__":
     unittest.main()
