@@ -1,6 +1,9 @@
 # ScamShield AI
 
 **ForgeHacks 2026 Hackathon &bull; Track: AI + Cybersecurity**
+## 🚀 Live Demo
+
+**Try ScamShield AI:** https://scamshield-ai-k8kw.onrender.com
 
 ScamShield AI is an intelligent digital threat and fraud detection assistant. It combines deterministic local URL heuristic inspection, PhishTank reputation intelligence, and Google Gemini multimodal reasoning to protect users against digital scams, phishing, social engineering, and impersonation across SMS, email, messaging platforms, and screenshots.
 
@@ -47,7 +50,23 @@ ScamShield AI bridges this gap with an intuitive, multi-layered defensive triage
 - **Graceful Degradation Architecture**: If Gemini is temporarily down, the system does not crash; it preserves local URL analysis, PhishTank reputation lookups, and presents a degraded assessment.
 - **Resilient AI Fallback Architecture**: Automatically handles transient API quota/concurrency issues (`503 UNAVAILABLE`, `429 RESOURCE_EXHAUSTED`) with exponential backoff retries and cascading model fallbacks.
 - **Interactive Preset Scenarios**: One-click test scenarios in the UI for single messages and multi-turn conversations.
+## 📸 Screenshots
 
+### Main Interface
+
+![ScamShield AI Main Interface](screenshots/main-interface.png)
+
+### Multi-Attack Detection
+
+![Multi-Attack Detection](screenshots/multi-attack.png)
+
+### UPI Scam Detection
+
+![UPI Scam Detection](screenshots/upi-scam.png)
+
+### Screenshot Analysis
+
+![Screenshot Analysis](screenshots/screenshot-analysis.png)
 ---
 
 ## System Architecture
